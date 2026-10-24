@@ -10,6 +10,12 @@ import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import InputAdornment from "@mui/material/InputAdornment";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+declare module "*.jpg";
+declare module "*.png";
+declare module "*.svg";
+
+import CompanyLogo from "./assets/company_logo.jpg";
+import SchoolLogo from "./assets/school_logo.jpg";
 
 function LoginPage() {
   const [values, setValues] = useState({
@@ -176,6 +182,34 @@ function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      <footer className="site-footer">
+        <div className="footer-brand">
+          <img
+            className="footer-brand-logo"
+            src={CompanyLogo}
+            alt="JDVP brand logo"
+          />
+          <div className="footer-school">
+            <img
+              className="footer-school-logo"
+              src={SchoolLogo}
+              role="img"
+              aria-label="School logo placeholder"
+            />
+            <div className="footer-school-details">
+              <span className="footer-school-label">School partner</span>
+              <span className="footer-school-name">
+                Luis Y. Ferror Jr. Senior High School
+              </span>
+            </div>
+          </div>
+        </div>
+        <p className="footer-credit">
+          <span>Powered by</span>
+          <strong>Nexus</strong>
+        </p>
+      </footer>
     </main>
   );
 }

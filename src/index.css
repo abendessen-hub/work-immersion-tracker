@@ -47,10 +47,18 @@ body {
   place-items: center;
   overflow: hidden;
   padding: 32px;
-  display: flex;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  row-gap: 32px;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+}
+
+.page-background > .rail {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
 .rail::after {
@@ -212,6 +220,7 @@ input {
 @media (max-width: 480px) {
   .page-background {
     padding: 16px;
+    row-gap: 24px;
   }
 
   .rail {
