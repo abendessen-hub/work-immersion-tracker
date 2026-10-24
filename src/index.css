@@ -44,12 +44,13 @@ body {
 .page-background {
   background: var(--background-page);
   position: relative;
-  display: grid;
-  min-height: 100vh;
-  min-height: 100dvh;
   place-items: center;
   overflow: hidden;
   padding: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
 
 .rail::after {

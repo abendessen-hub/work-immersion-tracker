@@ -14,7 +14,7 @@
   font-size: 12px;
   font-weight: 750;
   letter-spacing: 0.14em;
-  line-height: 1.4;
+  line-height: 1;
   text-transform: uppercase;
 }
 
@@ -52,29 +52,12 @@
   line-height: 1.55;
 }
 
-.login-show-password {
-  color: var(--color-muted);
-  font-size: 12px;
-  line-height: 1.55;
-}
-
-.login-show-password input[type="checkbox"] {
-  margin: 0;
-  flex-shrink: 0; /* Prevents the checkbox from getting squished */
-}
-
-/* Optional: Ensures the checkbox input matches the small text size */
-
 .login-message {
   color: var(--color-primary);
   font-weight: 600;
 }
 
 @media (max-width: 480px) {
-  .login-page {
-    padding: 20px;
-  }
-
   .login-card {
     padding: 28px 24px;
   }

@@ -169,7 +169,7 @@ function LoginPage() {
 
 function App() {
   return (
-    <main className="login-page page-background">
+    <main className="page-background">
       <div className="rail" aria-hidden="true" />
       <Routes>
         <Route path="/" element={<LoginPage />} />

@@ -1,9 +1,12 @@
+import "./dashboard.css";
+
 function DashboardPage() {
   return (
-    <section aria-labelledby="dashboard-title">
-      <h1 id="dashboard-title">Dashboard</h1>
+    <section className="dashboard-card">
+      <p className="eyebrow">Work Immersion Tracker: W.I.T</p>
+      <h1>Dashboard</h1>
     </section>
-  )
+  );
 }
 
-export default DashboardPage
+export default DashboardPage;
