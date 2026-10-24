@@ -47,6 +47,14 @@ The project includes a `server` script for running the app with Vercel's local d
 npm install --global vercel
 ```
 
+## Grabbing .env.local with Vercel link
+
+Once you installed the Vercel CLI try running this command to link the enviroment files (In case, you're not the owner of the Vercel project ask the Project Manager to pull the .env.local)
+
+```bash
+vercel link
+```
+
 Then, from the project directory, start the local Vercel server:
 
 ```bash
@@ -86,10 +94,10 @@ vercel --prod
 
 ## Useful scripts
 
-| Command | Description |
-| --- | --- |
-| `npm run dev` | Start the Vite development server |
-| `npm run server` | Start the local Vercel development server |
-| `npm run build` | Type-check and build the production app |
-| `npm run preview` | Preview the production build locally |
-| `npm run lint` | Run ESLint |
+| Command           | Description                               |
+| ----------------- | ----------------------------------------- |
+| `npm run dev`     | Start the Vite development server         |
+| `npm run server`  | Start the local Vercel development server |
+| `npm run build`   | Type-check and build the production app   |
+| `npm run preview` | Preview the production build locally      |
+| `npm run lint`    | Run ESLint                                |
