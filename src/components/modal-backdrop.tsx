@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react';
+import type { ReactNode } from "react";
 
-function ModalBackdrop({
+function renderModalBackdrop({
   hidden,
   children,
 }: {
@@ -14,4 +14,4 @@ function ModalBackdrop({
   );
 }
 
-export default ModalBackdrop;
+export default renderModalBackdrop;

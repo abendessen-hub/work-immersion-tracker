@@ -1,6 +1,11 @@
 :root {
   font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
     sans-serif;
   color: #14243f;
   background: #4e86ff;
@@ -53,7 +58,11 @@ body {
   bottom: 0;
   left: 0;
   height: 145px;
-  background: linear-gradient(150deg, transparent 35%, rgb(255 255 255 / 13%) 36%);
+  background: linear-gradient(
+    150deg,
+    transparent 35%,
+    rgb(255 255 255 / 13%) 36%
+  );
   content: "";
 }
 
@@ -65,7 +74,7 @@ body {
   place-items: center;
   padding: 16px;
   z-index: 999;
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(2px);
 }
 
 .modal-backdrop[hidden] {
@@ -73,14 +82,125 @@ body {
 }
 
 .modal {
-  background: linear-gradient(180deg, var(--palette-white) 0%, var(--palette-brand-lightest) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--palette-white) 0%,
+    var(--palette-brand-lightest) 100%
+  );
   width: 100%;
   max-width: 32rem;
   padding: 26px;
   border-radius: 20px;
-  box-shadow: 0 24px 50px color-mix(in srgb, var(--color-overlay) 22%, transparent);
+  box-shadow: 0 24px 50px
+    color-mix(in srgb, var(--color-overlay) 22%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
   animation: modalIn 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.form-field {
+  position: relative;
+  display: grid;
+  width: 100%;
+  gap: 7px;
+}
+
+.form-field label {
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.form-field .MuiOutlinedInput-root {
+  width: 100%;
+  height: 48px;
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 15px;
+  transition: box-shadow 150ms ease;
+}
+
+.form-field .MuiOutlinedInput-input {
+  padding: 0 13px;
+}
+
+.form-field .MuiOutlinedInput-input::placeholder {
+  color: #9aacc8;
+  opacity: 1;
+}
+
+.form-field .MuiOutlinedInput-notchedOutline {
+  border-color: var(--color-border);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.form-field .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: var(--color-border-strong);
+}
+
+.form-field
+  .MuiOutlinedInput-root.Mui-focused
+  .MuiOutlinedInput-notchedOutline {
+  border-color: var(--color-border-strong);
+}
+
+.form-field .MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 0 0 4px var(--color-focus);
+}
+
+.simple-button--small {
+  min-height: 36px;
+  padding: 0 14px;
+  font-size: 14px;
+}
+
+.simple-button--medium {
+  min-height: 48px;
+  padding: 0 22px;
+  font-size: 16px;
+}
+
+.simple-button--large {
+  min-height: 56px;
+  padding: 0 28px;
+  font-size: 18px;
+}
+
+.simple-button--primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.simple-button--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.simple-button--secondary {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-primary);
+}
+
+.simple-button--secondary:hover:not(:disabled) {
+  border-color: var(--color-border-strong);
+  background: var(--color-focus);
+}
+
+.simple-button--full-width {
+  width: 100%;
+}
+
+.simple-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.simple-button:focus-visible {
+  outline: 3px solid var(--color-border-strong);
+  outline-offset: 3px;
 }
 
 button,
