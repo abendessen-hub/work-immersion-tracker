@@ -47,12 +47,16 @@ The project includes a `server` script for running the app with Vercel's local d
 npm install --global vercel
 ```
 
-## Grabbing .env.local with Vercel link
-
 Once you installed the Vercel CLI try running this command to link the enviroment files (In case, you're not the owner of the Vercel project ask the Project Manager to pull the .env.local)
 
 ```bash
 vercel link
+```
+
+After linking your Vercel run this command to get .env.local if it's not already pulled automatically
+
+```bash
+vercel env pull .env.local
 ```
 
 Then, from the project directory, start the local Vercel server:
