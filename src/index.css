@@ -53,6 +53,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  min-height: 100svh;
 }
 
 .page-background > .rail {
@@ -221,9 +222,5 @@ input {
   .page-background {
     padding: 16px;
     row-gap: 24px;
-  }
-
-  .rail {
-    width: 20px;
   }
 }
