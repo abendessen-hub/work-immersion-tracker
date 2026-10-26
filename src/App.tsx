@@ -209,7 +209,7 @@ function App() {
             </div>
           </div>
         </div>
-        <div>
+        <div className="footer-credit-details">
           <p className="footer-credit">
             <span>Powered by</span>
             <strong>Nexus</strong>

@@ -27,3 +27,14 @@ dist-ssr
 *.sln
 *.sw?
 .env*
+
+# Build, cache & testing
+*.tsbuildinfo
+.cache
+coverage
+
+# AI & local config
+.claude/
+.codegraph/
+.mcp.json
+

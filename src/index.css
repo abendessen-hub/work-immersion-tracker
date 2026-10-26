@@ -77,13 +77,13 @@ body {
 }
 
 .modal-backdrop {
+  z-index: 100;
   position: fixed;
   inset: 0;
   background: color-mix(in srgb, var(--color-overlay) 65%, transparent);
   display: grid;
   place-items: center;
   padding: 16px;
-  z-index: 999;
   backdrop-filter: blur(2px);
 }
 
