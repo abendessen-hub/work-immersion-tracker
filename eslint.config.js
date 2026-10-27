@@ -19,4 +19,11 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    files: ['api/**/*.ts'],
+    extends: [js.configs.recommended, tseslint.configs.recommended],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
 ])

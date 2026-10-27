@@ -1,8 +1,13 @@
 import "./App.css";
-import { useState, type FormEvent, type MouseEvent } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { useState, type FormEvent, type MouseEvent, useEffect } from "react";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import SimpleButton from "./components/simple-button";
 import DashboardPage from "./pages/dashboard";
+import ScanQrPage from "./pages/dashboard/scan-qr";
+import GenerateQrPage from "./pages/dashboard/generate-qr";
+import AttendancePage from "./pages/dashboard/attendance";
+import CreateStudentAccountsPage from "./pages/dashboard/create-student-accounts";
+import CreateTeacherAccountsPage from "./pages/dashboard/create-teacher-accounts";
 import Form from "./components/form";
 import ModalBackdrop from "./components/modal-backdrop";
 
@@ -10,14 +15,12 @@ import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import InputAdornment from "@mui/material/InputAdornment";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-declare module "*.jpg";
-declare module "*.png";
-declare module "*.svg";
 
 import CompanyLogo from "./assets/company_logo.jpg";
 import SchoolLogo from "./assets/school_logo.jpg";
 
 function LoginPage() {
+  const navigate = useNavigate();
   const [values, setValues] = useState({
     username: "",
     password: "",
@@ -41,11 +44,54 @@ function LoginPage() {
   const handleMouseDownPassword = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setValues({ ...values, changePassModalOpen: true });
-    // navigate('/dashboard')
-  }
+
+  useEffect(() => {
+    async function verifySession() {
+      try {
+        const response = await fetch("/api/me");
+        if (response.ok) {
+          const data = await response.json();
+          // setUser(data); // Auto sign-in successful!
+        }
+      } catch (err) {
+        console.log("No active session found.");
+      } finally {
+        // setCheckingSession(false); // Done loading
+      }
+    }
+
+    verifySession();
+  }, []);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    //wip: add logging in ui
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: values.username,
+          password: values.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        //wip: add login failed
+        return;
+      }
+
+      console.log(`Logged in successfully as: ${data.username}`);
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Network error:", err);
+      //add network error for ogging in
+    }
+  };
 
   function handleChangePasswordSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -184,6 +230,17 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard/scan-qr" element={<ScanQrPage />} />
+        <Route path="/dashboard/generate-qr" element={<GenerateQrPage />} />
+        <Route path="/dashboard/attendance" element={<AttendancePage />} />
+        <Route
+          path="/dashboard/create-student-accounts"
+          element={<CreateStudentAccountsPage />}
+        />
+        <Route
+          path="/dashboard/create-teacher-accounts"
+          element={<CreateTeacherAccountsPage />}
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
