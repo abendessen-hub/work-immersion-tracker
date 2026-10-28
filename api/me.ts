@@ -27,9 +27,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       userId: number;
       username: string;
       accessId: number;
-      sectionId: number;
-      companyId: number;
-      changePassword: boolean;
+      sectionId: number | null;
+      companyId: number | null;
+      changedPassword: boolean;
     };
 
     return res.status(200).json({
@@ -39,9 +39,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       accessId: decoded.accessId,
       sectionId: decoded.sectionId,
       companyId: decoded.companyId,
-      changedPassword: decoded.changePassword,
+      changedPassword: decoded.changedPassword,
     });
-  } catch (err) {
+  } catch {
     return res.status(403).json({ error: "Invalid or expired session" });
   }
 }

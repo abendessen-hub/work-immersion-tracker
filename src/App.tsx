@@ -25,7 +25,8 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import CompanyLogo from "./assets/company_logo.jpg";
 import SchoolLogo from "./assets/school_logo.jpg";
 
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
+import { useAuth } from "./context/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function LoginPage() {
@@ -93,6 +94,7 @@ function LoginPage() {
       signingIn: true,
     });
     try {
+      const tempPassword = values.password;
       const response = await fetch("/api/login", {
         method: "POST",
         headers: {
@@ -100,7 +102,7 @@ function LoginPage() {
         },
         body: JSON.stringify({
           username: values.username,
-          password: values.password,
+          password: tempPassword,
         }),
       });
 
@@ -126,7 +128,7 @@ function LoginPage() {
         setPendingUser(data);
         setValues({
           ...values,
-          currentPassword: values.password,
+          currentPassword: tempPassword,
           changePassModalOpen: true,
         });
       }
@@ -264,6 +266,7 @@ function LoginPage() {
               type={showPassword.currentPassword ? "text" : "password"}
               autoComplete="currentPassword"
               placeholder="Current Password"
+              value={values.currentPassword}
               onChange={(event) => {
                 setValues({ ...values, currentPassword: event.target.value });
               }}

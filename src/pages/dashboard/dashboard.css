@@ -339,6 +339,70 @@
   max-width: 460px;
 }
 
+.dashboard-inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.dashboard-message {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.dashboard-message--error {
+  color: #a32626;
+}
+
+.file-picker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.file-picker input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.qr-preview {
+  width: min(100%, 360px);
+  padding: 12px;
+  border: 1px solid #d5e3fb;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.qr-reader {
+  width: min(100%, 480px);
+}
+
+.attendance-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  align-items: end;
+  gap: 14px;
+}
+
+.attendance-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.attendance-table-wrap .placeholder-table {
+  min-width: 720px;
+}
+
 /* ---- focus + motion ---- */
 
 .dashboard-card :is(.logout-btn, .action-card):focus-visible {

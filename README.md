@@ -96,6 +96,33 @@ Follow the prompts to link the project and create a preview deployment. To deplo
 vercel --prod
 ```
 
+## Account and attendance setup
+
+Before using spreadsheet account creation, QR check-in, or attendance reports, run
+[`database/migrations/001_accounts_attendance.sql`](./database/migrations/001_accounts_attendance.sql)
+against the Neon database configured by `DATABASE_URL`. It creates the reference
+tables `access_reference`, `company_reference`, `immersion_teacher`, and
+`section_reference`, along with `users` and `attendance_record` matching the
+provided Neon schema. Existing tables are not altered.
+
+Add reference rows to `section_reference(section_name)` and
+`company_reference(company_name)` before importing students. Section/company names
+in the workbook match those references without case sensitivity.
+`immersion_teacher` is a separate reference entity; it does not create or grant a
+teacher login. Access role IDs are looked up by name from `access_reference`.
+
+Student import accepts `.xlsx` workbooks with these headers:
+`LRN`, `Last Name`, `First Name`, `Middle Name`, `Section`, `Company`,
+`ContactNumber`. A student username and initial password are generated as the
+last four LRN digits plus lowercase last name without spaces. LRN and student
+names are used only to generate credentials and are not saved. The generated
+accounts workbook includes user-table fields and each temporary password;
+distribute it securely.
+Keep LRN and contact-number cells formatted as text to preserve leading zeros.
+Company QR codes record time in on first scan and time out on the next scan for
+the signed-in student. Attendance access is restricted server-side to the
+student's own rows; teacher/admin reports can filter by date, section, and company.
+
 ## Useful scripts
 
 | Command           | Description                               |

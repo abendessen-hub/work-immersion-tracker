@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
 import DashboardLayout from "./layout";
 import ActionCard from "../../components/action-card";
 
@@ -9,35 +9,35 @@ const actions = [
     description: "Record trainee attendance via camera",
     tag: "All roles",
     to: "/dashboard/scan-qr",
-    accessLevel: 1,
+    accessLevels: [1, 2, 3],
     active: true,
   },
   {
     title: "Generate QR",
-    description: "Generate 4-digit badges and batch print on A4 sheets",
+    description: "Generate a unique QR Code PNGs for companies",
     tag: "Admin",
-    accessLevel: 3,
+    accessLevels: [3],
     to: "/dashboard/generate-qr",
   },
   {
     title: "Attendance",
     description: "View live attendance progress, charts, and records",
     tag: "All roles",
-    accessLevel: 1,
+    accessLevels: [1, 2, 3],
     to: "/dashboard/attendance",
   },
   {
     title: "Create Student Accounts",
     description: "Create accounts for students using Spreadsheets",
     tag: "Teacher",
-    accessLevel: 2,
+    accessLevels: [2, 3],
     to: "/dashboard/create-student-accounts",
   },
   {
     title: "Create Teacher Accounts",
     description: "Create accounts for teachers using this site",
     tag: "Admin",
-    accessLevel: 3,
+    accessLevels: [3],
     to: "/dashboard/create-teacher-accounts",
   },
 ];
@@ -62,6 +62,7 @@ function DashboardPage() {
             description={action.description}
             tag={action.tag}
             active={action.active}
+            accessLevels={action.accessLevels}
             onClick={() => navigate(action.to)}
           />
         ))}

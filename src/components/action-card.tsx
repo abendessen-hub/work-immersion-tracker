@@ -1,19 +1,19 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
 type ActionCardProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   title: string;
   description: string;
   tag?: ReactNode;
   active?: boolean;
-  accessLevel?: number;
+  accessLevels?: number[];
 };
 
 function ActionCard({
   title,
   description,
   tag,
-  accessLevel = 1,
+  accessLevels = [1],
   active = false,
   className = "",
   ...buttonProps
@@ -22,7 +22,7 @@ function ActionCard({
     .filter(Boolean)
     .join(" ");
   const { user } = useAuth();
-  if ((user ? user.accessId : 1) < accessLevel) {
+  if (!accessLevels.includes(user ? user.accessId : 1)) {
     return <></>;
   }
   return (

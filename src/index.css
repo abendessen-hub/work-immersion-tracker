@@ -166,6 +166,26 @@ body {
   box-shadow: 0 0 0 4px var(--color-focus);
 }
 
+.form-field :is(select, input[type="date"], textarea) {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.form-field textarea {
+  resize: vertical;
+}
+
+.form-field :is(select, input, textarea):focus-visible {
+  border-color: var(--color-border-strong);
+  outline: 3px solid var(--color-focus);
+}
+
 .simple-button--small {
   min-height: 36px;
   padding: 0 14px;
