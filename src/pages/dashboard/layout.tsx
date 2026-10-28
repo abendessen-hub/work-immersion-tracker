@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import "./dashboard.css";
 
 type DashboardLayoutProps = {
@@ -7,6 +8,7 @@ type DashboardLayoutProps = {
   title: string;
   description?: string;
   back?: boolean;
+  logout?: boolean;
   children: ReactNode;
 };
 
@@ -15,10 +17,19 @@ function DashboardLayout({
   title,
   description,
   back = true,
+  logout = false,
   children,
 }: DashboardLayoutProps) {
   const navigate = useNavigate();
-
+  const { logout: callLogout } = useAuth();
+  const [logoutMessage, setLogoutMessage] = useState("Log Out");
+  const handleLogout = () => {
+    setLogoutMessage("Logging out...");
+    callLogout().finally(() => {
+      setLogoutMessage("Log Out.");
+      navigate("/");
+    });
+  };
   return (
     <section className="dashboard-card">
       <div className="dashboard-header">
@@ -39,13 +50,11 @@ function DashboardLayout({
               Back
             </button>
           ) : null}
-          <button
-            type="button"
-            className="logout-btn"
-            onClick={() => navigate("/")}
-          >
-            Log Out
-          </button>
+          {logout ? (
+            <button type="button" className="logout-btn" onClick={handleLogout}>
+              {logoutMessage}
+            </button>
+          ) : null}
         </div>
       </div>
 

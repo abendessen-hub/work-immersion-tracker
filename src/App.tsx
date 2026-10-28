@@ -1,6 +1,12 @@
 import "./App.css";
-import { useState, type FormEvent, type MouseEvent, useEffect } from "react";
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { useState, type FormEvent, type MouseEvent } from "react";
+import {
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import SimpleButton from "./components/simple-button";
 import DashboardPage from "./pages/dashboard";
 import ScanQrPage from "./pages/dashboard/scan-qr";
@@ -19,21 +25,39 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import CompanyLogo from "./assets/company_logo.jpg";
 import SchoolLogo from "./assets/school_logo.jpg";
 
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, user, loading } = useAuth();
   const [values, setValues] = useState({
     username: "",
     password: "",
+    currentPassword: "",
     newPassword: "",
     confirmPassword: "",
-
     changePassModalOpen: false,
+
+    signingIn: false,
+    changingPassword: false,
+  });
+  const [errors, setErrors] = useState<{
+    signIn?: string;
+    changePassword?: string;
+  }>({
+    signIn: (() =>
+      (location.state as { error?: string } | null)?.error ?? "")(),
+    changePassword: "",
   });
   const [showPassword, setShowpassword] = useState({
     password: false,
+    currentPassword: false,
     newPassword: false,
     confirmPassword: false,
   });
+
   const handleClickShowPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
     const clickedName = e.currentTarget.name as keyof typeof showPassword;
     setShowpassword({
@@ -41,31 +65,30 @@ function LoginPage() {
       [clickedName]: !showPassword[clickedName],
     });
   };
+
   const handleMouseDownPassword = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
 
-  useEffect(() => {
-    async function verifySession() {
-      try {
-        const response = await fetch("/api/me");
-        if (response.ok) {
-          const data = await response.json();
-          // setUser(data); // Auto sign-in successful!
-        }
-      } catch (err) {
-        console.log("No active session found.");
-      } finally {
-        // setCheckingSession(false); // Done loading
-      }
-    }
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "100px", color: "white" }}>
+        Loading session...
+      </div>
+    );
+  }
 
-    verifySession();
-  }, []);
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    //wip: add logging in ui
+    setErrors({ ...errors, signIn: "" });
+    setValues({
+      ...values,
+      signingIn: true,
+    });
     try {
       const response = await fetch("/api/login", {
         method: "POST",
@@ -81,22 +104,63 @@ function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        //wip: add login failed
+        setErrors({ ...errors, signIn: data.error || "Login failed" });
+        setValues({
+          ...values,
+          signingIn: false,
+        });
         return;
       }
 
-      console.log(`Logged in successfully as: ${data.username}`);
-      navigate("/dashboard");
+      // Update global auth state and redirect to dashboard
+      login(data);
+      setValues({
+        ...values,
+        signingIn: false,
+      });
+      if (data.changedPassword) {
+        navigate("/dashboard");
+      } else {
+        setValues({ ...values, changePassModalOpen: true });
+      }
     } catch (err) {
-      console.error("Network error:", err);
-      //add network error for ogging in
+      console.error("Network error at /api/login:", err);
+      setErrors({ ...errors, signIn: "An unexpected network error occurred." });
     }
   };
 
-  function handleChangePasswordSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleChangePasswordSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setValues({
+      ...values,
+      changingPassword: false,
+    });
+    try {
+      const response = await fetch("/api/change-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          currentPassword: values.currentPassword,
+          newPassword: values.newPassword,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setValues({
+          ...values,
+          changingPassword: false,
+        });
+        //wip: add some error message bullshit similar to login idfk im gonna go to sleep
+        return;
+      }
 
-    setValues({ ...values, changePassModalOpen: false });
+      setValues({ ...values, changePassModalOpen: false });
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Network error at /api/login:", err);
+    }
   }
 
   return (
@@ -143,11 +207,56 @@ function LoginPage() {
             }
           />
           <SimpleButton type="submit" size="medium">
-            Sign In
+            {values.signingIn ? "Signing In..." : "Sign In"}
           </SimpleButton>
+
+          {errors.signIn && (
+            <div
+              style={{
+                color: "#ff4d4f",
+                marginBottom: "1px",
+                fontSize: "14px",
+              }}
+            >
+              {errors.signIn}
+            </div>
+          )}
         </form>
+
         <ModalBackdrop hidden={!values.changePassModalOpen}>
           <form className="login-form" onSubmit={handleChangePasswordSubmit}>
+            <Form
+              label="Current Password"
+              id="currentPassword"
+              type={showPassword.currentPassword ? "text" : "password"}
+              autoComplete="currentPassword"
+              placeholder="Current Password"
+              onChange={(event) => {
+                setValues({ ...values, currentPassword: event.target.value });
+              }}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    name="currentPassword"
+                    type="button"
+                    aria-label={
+                      showPassword.currentPassword
+                        ? "Hide password"
+                        : "Show password"
+                    }
+                    aria-pressed={showPassword.currentPassword}
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                  >
+                    {showPassword.currentPassword ? (
+                      <Visibility />
+                    ) : (
+                      <VisibilityOff />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
             <Form
               label="New Password"
               id="newPassword"
@@ -223,25 +332,71 @@ function LoginPage() {
   );
 }
 
-function App() {
+// --- Main App Component Wrapped with AuthProvider ---
+function AppContent() {
   return (
     <main className="page-background">
       <div className="rail" aria-hidden="true" />
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/dashboard/scan-qr" element={<ScanQrPage />} />
-        <Route path="/dashboard/generate-qr" element={<GenerateQrPage />} />
-        <Route path="/dashboard/attendance" element={<AttendancePage />} />
+
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/scan-qr"
+          element={
+            <ProtectedRoute>
+              <ScanQrPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/generate-qr"
+          element={
+            <ProtectedRoute>
+              <GenerateQrPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/attendance"
+          element={
+            <ProtectedRoute>
+              <AttendancePage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/dashboard/create-student-accounts"
-          element={<CreateStudentAccountsPage />}
+          element={
+            <ProtectedRoute>
+              <CreateStudentAccountsPage />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="/dashboard/create-teacher-accounts"
-          element={<CreateTeacherAccountsPage />}
+          element={
+            <ProtectedRoute>
+              <CreateTeacherAccountsPage />
+            </ProtectedRoute>
+          }
         />
-        <Route path="*" element={<Navigate to="/" replace />} />
+
+        <Route
+          path="*"
+          element={
+            <ProtectedRoute>
+              <Navigate to="/dashboard" replace />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
 
       <footer className="site-footer">
@@ -274,7 +429,7 @@ function App() {
 
           <p className="footer-credit">
             <span>Collaborated with</span>
-            <strong>N/A</strong>
+            <strong>XDO</strong>
           </p>
         </div>
       </footer>
@@ -282,4 +437,10 @@ function App() {
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}

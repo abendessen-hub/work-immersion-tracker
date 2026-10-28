@@ -49,6 +49,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         userId: user.user_id,
         username: user.username,
         accessId: user.access_id,
+        sectionId: user.section_id,
+        companyId: user.company_id,
+        changedPassword: user.changedPassword,
       },
       process.env.JWT_SECRET!,
       { expiresIn: "7d" },
@@ -65,6 +68,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       userId: user.user_id,
       username: user.username,
       accessId: user.access_id,
+      sectionId: user.section_id,
+      companyId: user.company_id,
+      changedPassword: user.changedPassword,
     });
   } catch (err) {
     console.error("Login failed:", err);
