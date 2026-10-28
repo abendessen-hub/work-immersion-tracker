@@ -118,9 +118,10 @@ function LoginPage() {
         ...values,
         signingIn: false,
       });
-      if (data.changedPassword) {
+      if (data.changedPassword ?? true) {
         navigate("/dashboard");
       } else {
+        setValues({ ...values, currentPassword: values.password });
         setValues({ ...values, changePassModalOpen: true });
       }
     } catch (err) {
