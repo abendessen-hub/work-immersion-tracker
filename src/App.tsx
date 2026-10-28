@@ -118,8 +118,12 @@ function LoginPage() {
         ...values,
         signingIn: false,
       });
+      setErrors({
+        ...errors,
+        signIn: `data.changedPassword: ${data.changedPassword} data.changedPassword === true: ${data.changedPassword === true}`,
+      });
       if (data.changedPassword === true) {
-        navigate("/dashboard");
+        //navigate("/dashboard");
       } else {
         setValues({
           ...values,
