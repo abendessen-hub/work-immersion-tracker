@@ -118,11 +118,14 @@ function LoginPage() {
         ...values,
         signingIn: false,
       });
-      if (data.changedPassword ?? true) {
+      if (data.changedPassword === true) {
         navigate("/dashboard");
       } else {
-        setValues({ ...values, currentPassword: values.password });
-        setValues({ ...values, changePassModalOpen: true });
+        setValues({
+          ...values,
+          currentPassword: values.password,
+          changePassModalOpen: true,
+        });
       }
     } catch (err) {
       console.error("Network error at /api/login:", err);
