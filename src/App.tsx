@@ -135,6 +135,7 @@ function LoginPage() {
       ...values,
       changingPassword: false,
     });
+    setErrors({ ...errors, changePassword: "" });
     try {
       const response = await fetch("/api/change-password", {
         method: "POST",
@@ -152,6 +153,10 @@ function LoginPage() {
           ...values,
           changingPassword: false,
         });
+        setErrors({
+          ...errors,
+          changePassword: data.error || "Changing password failed",
+        });
         //wip: add some error message bullshit similar to login idfk im gonna go to sleep
         return;
       }
@@ -160,6 +165,10 @@ function LoginPage() {
       navigate("/dashboard");
     } catch (err) {
       console.error("Network error at /api/login:", err);
+      setErrors({
+        ...errors,
+        changePassword: "An unexpected network error occurred.",
+      });
     }
   }
 
@@ -322,8 +331,22 @@ function LoginPage() {
               }
             />
             <SimpleButton size="medium" type="submit" fullWidth>
-              Change Password
+              {values.changingPassword
+                ? "Changing Password..."
+                : "Change Password"}
             </SimpleButton>
+
+            {errors.changePassword && (
+              <div
+                style={{
+                  color: "#ff4d4f",
+                  marginBottom: "1px",
+                  fontSize: "14px",
+                }}
+              >
+                {errors.changePassword}
+              </div>
+            )}
           </form>
         </ModalBackdrop>
         <p className="login-help">Enter your assigned username and password.</p>

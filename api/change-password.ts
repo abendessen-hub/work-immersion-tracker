@@ -51,7 +51,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const users = await sql`
-      SELECT user_id, password FROM users WHERE user_id = ${userId}
+      SELECT user_id, password, changedPassword FROM users WHERE user_id = ${userId}
     `;
 
     if (users.length === 0) {
@@ -59,7 +59,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const user = users[0];
-
+    const canChangedPassword = !user.changedPassword;
+    if (canChangedPassword) {
+      return res.status(401).json({ error: "Already changed password" });
+    }
     const isPasswordValid = await bcrypt.compare(
       currentPassword,
       user.password,
@@ -73,7 +76,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     await sql`
       UPDATE users 
-      SET password = ${hashedNewPassword} 
+      SET password = ${hashedNewPassword} , changedPassword = true
       WHERE user_id = ${userId}
     `;
 
