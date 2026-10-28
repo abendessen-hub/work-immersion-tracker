@@ -32,6 +32,9 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, user, loading } = useAuth();
+  const [pendingUser, setPendingUser] = useState<
+    Parameters<typeof login>[0] | null
+  >(null);
   const [values, setValues] = useState({
     username: "",
     password: "",
@@ -78,7 +81,7 @@ function LoginPage() {
     );
   }
 
-  if (user) {
+  if (user?.changedPassword) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -112,19 +115,15 @@ function LoginPage() {
         return;
       }
 
-      // Update global auth state and redirect to dashboard
-      login(data);
       setValues({
         ...values,
         signingIn: false,
       });
-      setErrors({
-        ...errors,
-        signIn: `data.changedPassword: ${data.changedPassword} data.changedPassword === true: ${data.changedPassword === true}`,
-      });
       if (data.changedPassword === true) {
-        //navigate("/dashboard");
+        login(data);
+        navigate("/dashboard");
       } else {
+        setPendingUser(data);
         setValues({
           ...values,
           currentPassword: values.password,
@@ -139,9 +138,13 @@ function LoginPage() {
 
   async function handleChangePasswordSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (values.newPassword !== values.confirmPassword) {
+      setErrors({ ...errors, changePassword: "Passwords do not match." });
+      return;
+    }
     setValues({
       ...values,
-      changingPassword: false,
+      changingPassword: true,
     });
     setErrors({ ...errors, changePassword: "" });
     try {
@@ -165,14 +168,27 @@ function LoginPage() {
           ...errors,
           changePassword: data.error || "Changing password failed",
         });
-        //wip: add some error message bullshit similar to login idfk im gonna go to sleep
         return;
       }
 
-      setValues({ ...values, changePassModalOpen: false });
+      if (!pendingUser) {
+        setValues({ ...values, changingPassword: false });
+        setErrors({
+          ...errors,
+          changePassword: "Please sign in again before changing your password.",
+        });
+        return;
+      }
+      setValues({
+        ...values,
+        changingPassword: false,
+        changePassModalOpen: false,
+      });
+      login({ ...pendingUser, changedPassword: true });
       navigate("/dashboard");
     } catch (err) {
       console.error("Network error at /api/login:", err);
+      setValues({ ...values, changingPassword: false });
       setErrors({
         ...errors,
         changePassword: "An unexpected network error occurred.",

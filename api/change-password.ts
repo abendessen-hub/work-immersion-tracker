@@ -31,7 +31,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       userId: number;
     };
     userId = decoded.userId;
-  } catch (err) {
+  } catch {
     return res.status(403).json({ error: "Invalid or expired session" });
   }
 
@@ -51,7 +51,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const users = await sql`
-      SELECT user_id, password, changedPassword FROM users WHERE user_id = ${userId}
+      SELECT user_id, username, password, access_id, section_id, company_id, "changedPassword"
+      FROM users
+      WHERE user_id = ${userId}
     `;
 
     if (users.length === 0) {
@@ -59,8 +61,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const user = users[0];
-    const canChangedPassword = !user.changedPassword;
-    if (canChangedPassword) {
+    if (user.changedPassword) {
       return res.status(401).json({ error: "Already changed password" });
     }
     const isPasswordValid = await bcrypt.compare(
@@ -76,9 +77,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     await sql`
       UPDATE users 
-      SET password = ${hashedNewPassword} , changedPassword = true
+      SET password = ${hashedNewPassword}, "changedPassword" = true
       WHERE user_id = ${userId}
     `;
+
+    const refreshedToken = jwt.sign(
+      {
+        userId: user.user_id,
+        username: user.username,
+        accessId: user.access_id,
+        sectionId: user.section_id,
+        companyId: user.company_id,
+        changedPassword: true,
+      },
+      process.env.JWT_SECRET!,
+      { expiresIn: "7d" },
+    );
+    const isProduction = process.env.NODE_ENV === "production";
+    res.setHeader(
+      "Set-Cookie",
+      `session=${refreshedToken}; HttpOnly; Path=/; Max-Age=${7 * 24 * 60 * 60}; SameSite=Lax${isProduction ? "; Secure" : ""}`,
+    );
 
     return res
       .status(200)
