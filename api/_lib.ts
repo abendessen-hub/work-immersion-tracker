@@ -7,6 +7,7 @@ export const sql = neon(process.env.DATABASE_URL!);
 export type Session = {
   userId: number;
   username: string;
+  fullname: string;
   accessId: number;
   sectionId: number | null;
   companyId: number | null;
@@ -32,6 +33,7 @@ export function getSession(req: VercelRequest): Session | null {
     return {
       userId,
       username: String(decoded.username ?? ""),
+      fullname: String(decoded.fullname ?? ""),
       accessId,
       sectionId: decoded.sectionId == null ? null : Number(decoded.sectionId),
       companyId: decoded.companyId == null ? null : Number(decoded.companyId),

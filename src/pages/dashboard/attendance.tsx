@@ -5,17 +5,14 @@ import SimpleButton from "../../components/simple-button";
 import { downloadWorkbook } from "../../utils/download-workbook";
 
 type AttendanceRecord = {
-  record_id: number;
   user_id: number;
-  username: string;
   full_name: string;
-  section_id: number;
   section_name: string;
-  company_id: number;
   company_name: string;
   date: string;
   time_in: string;
   time_out: string | null;
+  status: "Attended" | "Absent" | "No Time Out";
 };
 
 type ReferenceData = {
@@ -30,15 +27,16 @@ function manilaToday() {
     month: "2-digit",
     day: "2-digit",
   }).formatToParts(new Date());
-  const value = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  const value = Object.fromEntries(
+    parts.map((part) => [part.type, part.value]),
+  );
   return `${value.year}-${value.month}-${value.day}`;
 }
 
 function AttendancePage() {
   const { user } = useAuth();
   const isStudent = user?.accessId === 1;
-  const [dateFrom, setDateFrom] = useState(manilaToday);
-  const [dateTo, setDateTo] = useState(manilaToday);
+  const [date, setDate] = useState(manilaToday);
   const [sectionId, setSectionId] = useState("");
   const [companyId, setCompanyId] = useState("");
   const [references, setReferences] = useState<ReferenceData>({
@@ -54,39 +52,45 @@ function AttendancePage() {
     fetch("/api/reference-data")
       .then(async (response) => {
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error ?? "Could not load filters.");
+        if (!response.ok)
+          throw new Error(data.error ?? "Could not load filters.");
         setReferences(data as ReferenceData);
       })
       .catch((error: unknown) => {
-        setMessage(error instanceof Error ? error.message : "Could not load filters.");
+        setMessage(
+          error instanceof Error ? error.message : "Could not load filters.",
+        );
       });
   }, [isStudent]);
 
   useEffect(() => {
     const controller = new AbortController();
     const params = new URLSearchParams();
-    if (dateFrom) params.set("dateFrom", dateFrom);
-    if (dateTo) params.set("dateTo", dateTo);
+    if (date) params.set("date", date);
     if (!isStudent && sectionId) params.set("sectionId", sectionId);
     if (!isStudent && companyId) params.set("companyId", companyId);
 
     fetch(`/api/attendance?${params.toString()}`, { signal: controller.signal })
       .then(async (response) => {
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error ?? "Could not load attendance.");
+        if (!response.ok)
+          throw new Error(data.error ?? "Could not load attendance.");
         setRecords(data.records as AttendanceRecord[]);
+        console.log(data.records);
         setMessage("");
       })
       .catch((error: unknown) => {
         if (controller.signal.aborted) return;
-        setMessage(error instanceof Error ? error.message : "Could not load attendance.");
+        setMessage(
+          error instanceof Error ? error.message : "Could not load attendance.",
+        );
       })
       .finally(() => {
         if (!controller.signal.aborted) setBusy(false);
       });
 
     return () => controller.abort();
-  }, [companyId, dateFrom, dateTo, isStudent, sectionId]);
+  }, [companyId, date, isStudent, sectionId]);
 
   const presentCount = records.filter((record) => record.time_in).length;
   const completedCount = records.filter((record) => record.time_out).length;
@@ -101,31 +105,29 @@ function AttendancePage() {
       const workbook = new Workbook();
       const worksheet = workbook.addWorksheet("Attendance");
       worksheet.columns = [
-        { header: "user_id", key: "user_id", width: 12 },
         { header: "Full Name", key: "full_name", width: 28 },
-        { header: "Username", key: "username", width: 22 },
-        { header: "Student Username", key: "username", width: 22 },
         { header: "Section", key: "section_name", width: 24 },
-        { header: "section_id", key: "section_id", width: 12 },
         { header: "Company", key: "company_name", width: 28 },
-        { header: "company_id", key: "company_id", width: 12 },
         { header: "Date", key: "date", width: 14 },
         { header: "Time In", key: "time_in", width: 14 },
         { header: "Time Out", key: "time_out", width: 14 },
+        { header: "Status", key: "status", width: 20 },
       ];
       worksheet.addRows(
         records.map((record) => ({
           ...record,
           time_out: record.time_out ?? "",
+          date: new Date(record.date).toLocaleDateString(),
         })),
       );
       worksheet.getRow(1).font = { bold: true };
-      await downloadWorkbook(
-        workbook,
-        `attendance-report-${dateFrom || "all"}-to-${dateTo || "all"}.xlsx`,
-      );
+      await downloadWorkbook(workbook, `attendance-report-${date}.xlsx`);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Attendance report could not be downloaded.");
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Attendance report could not be downloaded.",
+      );
     }
   };
 
@@ -136,12 +138,14 @@ function AttendancePage() {
       description={
         isStudent
           ? "View your own attendance records."
-          : "Filter attendance by date, section, and company; export the results."
+          : "Filter attendance by date, section, and company; export the results. \n To use Attendance Report, You must insert a Date, Section, and Company First"
       }
     >
       <div className="stat-grid">
         <div className="stat-tile">
-          <span className="stat-label">{isStudent ? "Your records" : "Student records"}</span>
+          <span className="stat-label">
+            {isStudent ? "Your records" : "Student records"}
+          </span>
           <span className="stat-value">{busy ? "…" : records.length}</span>
         </div>
         {!isStudent ? (
@@ -164,26 +168,14 @@ function AttendancePage() {
         <h2 className="dashboard-section-title">Report filters</h2>
         <div className="attendance-filters">
           <div className="form-field">
-            <label htmlFor="attendance-date-from">Date from</label>
-            <input
-              id="attendance-date-from"
-              type="date"
-              value={dateFrom}
-              onChange={(event) => {
-                setBusy(true);
-                setDateFrom(event.target.value);
-              }}
-            />
-          </div>
-          <div className="form-field">
-            <label htmlFor="attendance-date-to">Date to</label>
+            <label htmlFor="attendance-date-to">Date</label>
             <input
               id="attendance-date-to"
               type="date"
-              value={dateTo}
+              value={date}
               onChange={(event) => {
                 setBusy(true);
-                setDateTo(event.target.value);
+                setDate(event.target.value);
               }}
             />
           </div>
@@ -227,7 +219,15 @@ function AttendancePage() {
               </div>
             </>
           ) : null}
-          <SimpleButton type="button" onClick={downloadReport} disabled={busy || !records.length}>
+          <SimpleButton
+            type="button"
+            onClick={downloadReport}
+            disabled={
+              busy ||
+              !records.length ||
+              (isStudent ? false : !date || !sectionId || !companyId)
+            }
+          >
             Download Attendance Report.xlsx
           </SimpleButton>
         </div>
@@ -238,9 +238,13 @@ function AttendancePage() {
           {message}
         </p>
       ) : null}
-      {busy ? <p className="dashboard-section-sub">Loading attendance…</p> : null}
+      {busy ? (
+        <p className="dashboard-section-sub">Loading attendance…</p>
+      ) : null}
       {!busy && !message && records.length === 0 ? (
-        <p className="dashboard-section-sub">No attendance records match these filters.</p>
+        <p className="dashboard-section-sub">
+          No attendance records match these filters.
+        </p>
       ) : null}
       {records.length ? (
         <div className="attendance-table-wrap">
@@ -256,14 +260,12 @@ function AttendancePage() {
               </tr>
             </thead>
             <tbody>
-              {records.map((record) => (
-                <tr key={record.record_id}>
-                  {!isStudent ? (
-                      <td>{record.full_name}</td>
-                  ) : null}
+              {records.map((record, index) => (
+                <tr key={index}>
+                  {!isStudent ? <td>{record.full_name}</td> : null}
                   <td>{record.section_name}</td>
                   <td>{record.company_name}</td>
-                  <td>{String(record.date).slice(0, 10)}</td>
+                  <td>{new Date(record.date).toLocaleDateString()}</td>
                   <td>{record.time_in}</td>
                   <td>{record.time_out ?? "—"}</td>
                 </tr>

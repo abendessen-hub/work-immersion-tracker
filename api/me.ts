@@ -26,6 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
       userId: number;
       username: string;
+      fullname: string;
       accessId: number;
       sectionId: number | null;
       companyId: number | null;
@@ -36,6 +37,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       success: true,
       userId: decoded.userId,
       username: decoded.username,
+      fullname: decoded.fullname,
       accessId: decoded.accessId,
       sectionId: decoded.sectionId,
       companyId: decoded.companyId,

@@ -26,59 +26,61 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!session) return res.status(401).json({ error: "Please sign in first" });
 
   if (req.method === "GET") {
-    const dateFrom = optionalDate(req.query.dateFrom);
-    const dateTo = optionalDate(req.query.dateTo);
+    const date = optionalDate(req.query.date);
     const sectionId = optionalId(req.query.sectionId);
     const companyId = optionalId(req.query.companyId);
-    if (dateFrom === undefined || dateTo === undefined) {
+    if (date === undefined) {
       return res.status(400).json({ error: "Use valid YYYY-MM-DD dates" });
     }
-    if (
-      sectionId === undefined ||
-      companyId === undefined
-    ) {
-      return res.status(400).json({ error: "Invalid section or company filter" });
-    }
-    if (dateFrom && dateTo && dateFrom > dateTo) {
-      return res.status(400).json({ error: "Start date must not follow end date" });
+    if (sectionId === undefined || companyId === undefined) {
+      return res
+        .status(400)
+        .json({ error: "Invalid section or company filter" });
     }
 
     try {
-      const records = session.accessId === 1
-        ? await sql`
-            SELECT a.record_id, a.user_id, u.username, u.full_name,
-                   a.section_id, s.section_name, a.company_id, c.company_name,
+      const records =
+        session.accessId === 1
+          ? await sql`
+            SELECT a.user_id, u.full_name,
+                   s.section_name, c.company_name,
                    a.date, a.time_in, a.time_out
             FROM attendance_record a
             JOIN users u ON u.user_id = a.user_id
             JOIN section_reference s ON s.section_id = a.section_id
             JOIN company_reference c ON c.company_id = a.company_id
             WHERE a.user_id = ${session.userId}
-              AND (${dateFrom}::date IS NULL OR a.date >= ${dateFrom}::date)
-              AND (${dateTo}::date IS NULL OR a.date <= ${dateTo}::date)
+              AND (${date}::date IS NULL OR a.date >= ${date}::date)
             ORDER BY a.date DESC, a.time_in DESC
             LIMIT 5000
           `
-        : await sql`
-            SELECT a.record_id, a.user_id, u.username, u.full_name,
-                   a.section_id, s.section_name, a.company_id, c.company_name,
-                   a.date, a.time_in, a.time_out
-            FROM attendance_record a
-            JOIN users u ON u.user_id = a.user_id
-            JOIN section_reference s ON s.section_id = a.section_id
-            JOIN company_reference c ON c.company_id = a.company_id
-            WHERE (${sectionId}::int IS NULL OR a.section_id = ${sectionId})
-              AND (${companyId}::int IS NULL OR a.company_id = ${companyId})
-              AND (${dateFrom}::date IS NULL OR a.date >= ${dateFrom}::date)
-              AND (${dateTo}::date IS NULL OR a.date <= ${dateTo}::date)
-            ORDER BY a.date DESC, a.time_in DESC
-            LIMIT 5000
+          : await sql`
+           SELECT u.user_id, u.full_name,
+                  s.section_name, c.company_name,
+                  a.date, a.time_in, a.time_out,
+                  CASE
+                      WHEN a.record_id IS NULL THEN 'Absent'
+                      WHEN a.time_out IS NULL THEN 'No Time Out'
+                      ELSE 'Attended'
+                  END AS status
+          FROM users u
+          LEFT JOIN attendance_record a ON u.user_id = a.user_id
+          LEFT JOIN section_reference s ON s.section_id = u.section_id
+          LEFT JOIN company_reference c ON c.company_id = u.company_id
+          WHERE (${sectionId}::int IS NULL OR u.section_id = ${sectionId})
+            AND (${companyId}::int IS NULL OR u.company_id = ${companyId})
+            AND (${date}::date IS NULL OR a.date >= ${date}::date OR a.date IS NULL)
+            AND (u.access_id = 1)
+          ORDER BY a.date DESC, a.time_in DESC
+          LIMIT 5000
           `;
 
       return res.status(200).json({ records });
     } catch (error) {
       console.error("Attendance query failed:", error);
-      return res.status(500).json({ error: "Attendance records could not be loaded" });
+      return res
+        .status(500)
+        .json({ error: "Attendance records could not be loaded" });
     }
   }
 
@@ -86,7 +88,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: "Method not allowed" });
   }
   if (session.accessId !== 1) {
-    return res.status(403).json({ error: "Only student accounts can check in" });
+    return res
+      .status(403)
+      .json({ error: "Only student accounts can check in" });
   }
 
   const companyId = req.body?.companyId;
@@ -95,6 +99,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // student attedance
     const users = await sql`
       SELECT u.user_id, u.access_id, u.section_id,
              COALESCE(u.company_id, s.company_id) AS company_id
@@ -104,14 +109,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     `;
     const user = users[0];
     if (!user || Number(user.access_id) !== 1) {
-      return res.status(403).json({ error: "Student account is no longer active" });
+      return res
+        .status(403)
+        .json({ error: "Student account is no longer active" });
     }
     if (Number(user.company_id) !== companyId) {
-      return res.status(403).json({ error: "This company QR does not match your assigned company" });
+      return res.status(403).json({
+        error: "This company QR does not match your assigned company",
+      });
     }
 
     if (!user.section_id || !user.company_id) {
-      return res.status(400).json({ error: "Your account has no assigned section or company" });
+      return res
+        .status(400)
+        .json({ error: "Your account has no assigned section or company" });
     }
 
     const [, result] = await sql.transaction([

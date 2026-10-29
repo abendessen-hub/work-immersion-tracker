@@ -49,8 +49,7 @@ function DashboardPage() {
     <DashboardLayout
       eyebrow="Dashboard"
       title="Work Immersion Tracker"
-      //wip: might add actual name of user to neon database
-      description={`Welcome back. ${user?.username} Pick an action below to get started.`}
+      description={`Welcome back. ${user?.fullname} Pick an action below to get started.`}
       back={false}
       logout={true}
     >

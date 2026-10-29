@@ -51,7 +51,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const users = await sql`
-      SELECT user_id, username, password, access_id, section_id, company_id, "changedPassword"
+      SELECT user_id, username, full_name, password, access_id, section_id, company_id, "changedPassword"
       FROM users
       WHERE user_id = ${userId}
     `;
@@ -85,6 +85,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       {
         userId: user.user_id,
         username: user.username,
+        fullname: user.full_name,
         accessId: user.access_id,
         sectionId: user.section_id,
         companyId: user.company_id,

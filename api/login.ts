@@ -29,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const rows = await sql`
-      SELECT user_id, username, password, access_id, section_id, company_id, "changedPassword"
+      SELECT user_id, username, full_name, password, access_id, section_id, company_id, "changedPassword"
       FROM users
       WHERE username = ${cleanUsername}
     `;
@@ -48,6 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       {
         userId: user.user_id,
         username: user.username,
+        fullname: user.full_name,
         accessId: user.access_id,
         sectionId: user.section_id,
         companyId: user.company_id,
@@ -67,6 +68,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       success: true,
       userId: user.user_id,
       username: user.username,
+      fullname: user.full_name,
       accessId: user.access_id,
       sectionId: user.section_id,
       companyId: user.company_id,

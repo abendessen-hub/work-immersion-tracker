@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "packageManager": "npm@10.x.x",
   "scripts": {
     "dev": "vite",
     "server": "vercel dev --local",
@@ -47,5 +48,8 @@
     "exceljs": {
       "uuid": "^11.1.1"
     }
+  },
+  "allowScripts": {
+    "esbuild@0.27.0": true
   }
 }
