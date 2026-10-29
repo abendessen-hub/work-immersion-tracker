@@ -46,7 +46,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       const records = session.accessId === 1
         ? await sql`
-            SELECT a.record_id, a.user_id, u.username,
+            SELECT a.record_id, a.user_id, u.username, u.full_name,
                    a.section_id, s.section_name, a.company_id, c.company_name,
                    a.date, a.time_in, a.time_out
             FROM attendance_record a
@@ -60,7 +60,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             LIMIT 5000
           `
         : await sql`
-            SELECT a.record_id, a.user_id, u.username,
+            SELECT a.record_id, a.user_id, u.username, u.full_name,
                    a.section_id, s.section_name, a.company_id, c.company_name,
                    a.date, a.time_in, a.time_out
             FROM attendance_record a

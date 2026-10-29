@@ -74,6 +74,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const lastName = text(row.lastName);
       const firstName = text(row.firstName);
       const middleName = text(row.middleName);
+      const fullName = [firstName, middleName, lastName]
+        .filter(Boolean)
+        .join(" ");
       const sectionName = text(row.section);
       const companyName = text(row.company);
       const contactNumber = text(row.contactNumber);
@@ -106,6 +109,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         lastName,
         firstName,
         middleName,
+        fullName,
         sectionName: section ? String(section.section_name) : sectionName,
         sectionId: section ? Number(section.section_id) : 0,
         companyName: company ? String(company.company_name) : companyName,
@@ -151,11 +155,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const inserts = hashedAccounts.map(
       (account) => sql`
       INSERT INTO users
-        (username, password, access_id, section_id, company_id, "changedPassword", contact_number)
+        (username, full_name, password, access_id, section_id, company_id, "changedPassword", contact_number)
       VALUES
-        (${account.username}, ${account.passwordHash}, ${studentAccess[0].access_id}, ${account.sectionId},
+        (${account.username}, ${account.fullName}, ${account.passwordHash}, ${studentAccess[0].access_id}, ${account.sectionId},
          ${account.companyId}, false, ${account.contactNumber})
-      RETURNING user_id, username, access_id, section_id, company_id, contact_number
+      RETURNING user_id, username, full_name, access_id, section_id, company_id, contact_number
     `,
     );
     const created = await sql.transaction(inserts);

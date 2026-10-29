@@ -50,10 +50,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const passwordHash = await bcrypt.hash(password, 10);
     const created = await sql`
       INSERT INTO users
-        (username, password, access_id, section_id, company_id, "changedPassword", contact_number)
+        (username, full_name, password, access_id, section_id, company_id, "changedPassword", contact_number)
       VALUES
-        (${username}, ${passwordHash}, ${teacherAccess[0].access_id}, NULL, NULL, true, ${contactNumber})
-      RETURNING user_id, username, access_id
+        (${username}, ${fullName}, ${passwordHash}, ${teacherAccess[0].access_id}, NULL, NULL, true, ${contactNumber})
+      RETURNING user_id, username, full_name, access_id
     `;
 
     return res.status(201).json({ user: created[0] });

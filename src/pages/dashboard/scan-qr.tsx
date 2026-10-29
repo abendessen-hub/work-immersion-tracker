@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Html5Qrcode as Html5QrcodeInstance } from "html5-qrcode";
 import { useAuth } from "../../context/useAuth";
 import DashboardLayout from "./layout";
@@ -8,7 +8,6 @@ function ScanQrPage() {
   const { user } = useAuth();
   const scannerRef = useRef<Html5QrcodeInstance | null>(null);
   const processingRef = useRef(false);
-  const [manualValue, setManualValue] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -25,7 +24,8 @@ function ScanQrPage() {
     const companyId =
       typeof payload.companyId === "number"
         ? payload.companyId
-        : typeof payload.companyId === "string" && /^\d+$/.test(payload.companyId)
+        : typeof payload.companyId === "string" &&
+            /^\d+$/.test(payload.companyId)
           ? Number(payload.companyId)
           : NaN;
     if (
@@ -42,38 +42,46 @@ function ScanQrPage() {
       body: JSON.stringify({ companyId }),
     });
     const result = await response.json();
-    if (!response.ok) throw new Error(result.error ?? "Attendance could not be recorded.");
+    if (!response.ok)
+      throw new Error(result.error ?? "Attendance could not be recorded.");
 
     const action = result.action === "time-in" ? "Time in" : "Time out";
     setIsError(false);
     setMessage(`${action} recorded successfully.`);
   }, []);
 
-  const handleScan = useCallback(async (value: string) => {
-    if (processingRef.current) return;
-    processingRef.current = true;
-    setBusy(true);
-    setMessage("");
-    try {
-      await processQr(value);
-    } catch (error) {
-      setIsError(true);
-      setMessage(error instanceof Error ? error.message : "Attendance could not be recorded.");
-    } finally {
-      const scanner = scannerRef.current;
-      scannerRef.current = null;
-      if (scanner) {
-        try {
-          await scanner.stop();
-        } catch (error) {
-          console.error("Could not stop the QR scanner:", error);
+  const handleScan = useCallback(
+    async (value: string) => {
+      if (processingRef.current) return;
+      processingRef.current = true;
+      setBusy(true);
+      setMessage("");
+      try {
+        await processQr(value);
+      } catch (error) {
+        setIsError(true);
+        setMessage(
+          error instanceof Error
+            ? error.message
+            : "Attendance could not be recorded.",
+        );
+      } finally {
+        const scanner = scannerRef.current;
+        scannerRef.current = null;
+        if (scanner) {
+          try {
+            await scanner.stop();
+          } catch (error) {
+            console.error("Could not stop the QR scanner:", error);
+          }
         }
+        setIsScanning(false);
+        setBusy(false);
+        processingRef.current = false;
       }
-      setIsScanning(false);
-      setBusy(false);
-      processingRef.current = false;
-    }
-  }, [processQr]);
+    },
+    [processQr],
+  );
 
   const startScanner = async () => {
     setMessage("");
@@ -90,11 +98,7 @@ function ScanQrPage() {
       setIsScanning(true);
     } catch (error) {
       setIsError(true);
-      setMessage(
-        error instanceof Error
-          ? `Camera could not start: ${error.message}`
-          : "Camera could not start. Check camera permission or use manual scan.",
-      );
+      setMessage(`Camera could not start: ${error}`);
     }
   };
 
@@ -106,26 +110,12 @@ function ScanQrPage() {
         await scanner.stop();
       } catch (error) {
         setIsError(true);
-        setMessage(error instanceof Error ? error.message : "Could not stop the camera.");
+        setMessage(
+          error instanceof Error ? error.message : "Could not stop the camera.",
+        );
       }
     }
     setIsScanning(false);
-  };
-
-  const submitManual = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!manualValue.trim() || busy) return;
-    setBusy(true);
-    setMessage("");
-    try {
-      await processQr(manualValue.trim());
-      setManualValue("");
-    } catch (error) {
-      setIsError(true);
-      setMessage(error instanceof Error ? error.message : "Attendance could not be recorded.");
-    } finally {
-      setBusy(false);
-    }
   };
 
   useEffect(() => {
@@ -150,51 +140,45 @@ function ScanQrPage() {
           <div className="dashboard-section">
             <h2 className="dashboard-section-title">Camera scanner</h2>
             <p className="dashboard-section-sub">
-              First scan records time in; the next scan records time out. A company
-              code that does not match your account will be rejected.
+              First scan records time in; the next scan records time out. A
+              company code that does not match your account will be rejected.
             </p>
             <div className="dashboard-inline-actions">
-              <SimpleButton type="button" onClick={startScanner} disabled={isScanning || busy}>
+              <SimpleButton
+                type="button"
+                onClick={startScanner}
+                disabled={isScanning || busy}
+              >
                 Start Camera
               </SimpleButton>
               {isScanning ? (
-                <SimpleButton type="button" variant="secondary" onClick={stopScanner}>
+                <SimpleButton
+                  type="button"
+                  variant="secondary"
+                  onClick={stopScanner}
+                >
                   Stop Camera
                 </SimpleButton>
               ) : null}
             </div>
             <div id="attendance-qr-reader" className="qr-reader" />
           </div>
-          <div className="dashboard-section">
-            <h2 className="dashboard-section-title">Manual QR entry</h2>
-            <p className="dashboard-section-sub">
-              Paste the QR contents only if camera scanning is unavailable.
-            </p>
-            <form className="dashboard-form" onSubmit={submitManual}>
-              <div className="form-field">
-                <label htmlFor="manual-company-qr">Company QR contents</label>
-                <textarea
-                  id="manual-company-qr"
-                  value={manualValue}
-                  onChange={(event) => setManualValue(event.target.value)}
-                  rows={3}
-                  required
-                />
-              </div>
-              <SimpleButton type="submit" disabled={busy}>
-                {busy ? "Recording..." : "Record Attendance"}
-              </SimpleButton>
-            </form>
-          </div>
         </>
       ) : (
         <p className="dashboard-message dashboard-message--error" role="status">
-          Company check-in is available to student accounts. Higher access levels can
-          review attendance from the Attendance page.
+          Company check-in is available to student accounts. Higher access
+          levels can review attendance from the Attendance page.
         </p>
       )}
       {message ? (
-        <p className={isError ? "dashboard-message dashboard-message--error" : "dashboard-message"} role="status">
+        <p
+          className={
+            isError
+              ? "dashboard-message dashboard-message--error"
+              : "dashboard-message"
+          }
+          role="status"
+        >
           {message}
         </p>
       ) : null}

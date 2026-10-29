@@ -8,6 +8,7 @@ type AttendanceRecord = {
   record_id: number;
   user_id: number;
   username: string;
+  full_name: string;
   section_id: number;
   section_name: string;
   company_id: number;
@@ -101,6 +102,7 @@ function AttendancePage() {
       const worksheet = workbook.addWorksheet("Attendance");
       worksheet.columns = [
         { header: "user_id", key: "user_id", width: 12 },
+        { header: "Full Name", key: "full_name", width: 28 },
         { header: "Username", key: "username", width: 22 },
         { header: "Student Username", key: "username", width: 22 },
         { header: "Section", key: "section_name", width: 24 },
@@ -257,7 +259,7 @@ function AttendancePage() {
               {records.map((record) => (
                 <tr key={record.record_id}>
                   {!isStudent ? (
-                      <td>{record.username}</td>
+                      <td>{record.full_name}</td>
                   ) : null}
                   <td>{record.section_name}</td>
                   <td>{record.company_name}</td>

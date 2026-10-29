@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS section_reference (
 CREATE TABLE IF NOT EXISTS users (
   user_id SERIAL PRIMARY KEY,
   username TEXT NOT NULL UNIQUE,
+  full_name TEXT NOT NULL,
   password TEXT NOT NULL,
   "changedPassword" BOOLEAN,
   section_id INTEGER REFERENCES section_reference(section_id),
@@ -30,6 +31,12 @@ CREATE TABLE IF NOT EXISTS users (
   contact_number TEXT,
   access_id INTEGER NOT NULL REFERENCES access_reference(access_id)
 );
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name TEXT;
+UPDATE users
+SET full_name = username
+WHERE full_name IS NULL OR BTRIM(full_name) = '';
+ALTER TABLE users ALTER COLUMN full_name SET NOT NULL;
 
 CREATE TABLE IF NOT EXISTS attendance_record (
   record_id SERIAL PRIMARY KEY,
