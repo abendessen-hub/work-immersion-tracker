@@ -154,12 +154,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     );
     const inserts = hashedAccounts.map(
       (account) => sql`
-      INSERT INTO users
-        (username, full_name, password, access_id, section_id, company_id, "changedPassword", contact_number)
-      VALUES
-        (${account.username}, ${account.fullName}, ${account.passwordHash}, ${studentAccess[0].access_id}, ${account.sectionId},
-         ${account.companyId}, false, ${account.contactNumber})
-      RETURNING user_id, username, full_name, access_id, section_id, company_id, contact_number
+        WITH inserted_user AS (
+          INSERT INTO users
+            (username, full_name, password, access_id, section_id, company_id, "changedPassword", contact_number)
+          VALUES
+            (${account.username}, ${account.fullName}, ${account.passwordHash}, ${studentAccess[0].access_id}, ${account.sectionId}, ${account.companyId}, false, ${account.contactNumber})
+          RETURNING username, full_name, contact_number, company_id, section_id
+        )
+        SELECT 
+          u.username,
+          u.full_name,
+          u.contact_number,
+          c.company_name,
+          s.section_name
+        FROM inserted_user u
+        LEFT JOIN company_reference c ON c.id = u.company_id
+        LEFT JOIN section_reference s ON s.id = u.section_id
     `,
     );
     const created = await sql.transaction(inserts);

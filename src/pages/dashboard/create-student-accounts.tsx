@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import DashboardLayout from "./layout";
 import SimpleButton from "../../components/simple-button";
 import { downloadWorkbook } from "../../utils/download-workbook";
@@ -14,13 +14,11 @@ type ImportRow = {
 };
 
 type CreatedAccount = {
-  user_id: number;
   username: string;
   temporaryPassword: string;
-  section_id: number;
-  company_id: number;
   contact_number: string;
-  access_id: number;
+  section_name: string;
+  company_name: string;
 };
 
 const expectedHeaders = [
@@ -51,7 +49,17 @@ async function downloadTemplate() {
   const { Workbook } = await import("exceljs");
   const workbook = new Workbook();
   const sheet = workbook.addWorksheet("Students");
-  sheet.addRow(expectedHeaders);
+
+  sheet.columns = [
+    { header: "LRN", key: "lrn", width: 32 },
+    { header: "Last Name", key: "lastName", width: 20 },
+    { header: "First Name", key: "firstName", width: 20 },
+    { header: "Middle Name", key: "middleName", width: 20 },
+    { header: "Section", key: "section", width: 15 },
+    { header: "Company", key: "company", width: 25 },
+    { header: "ContactNumber", key: "contactNumber", width: 20 },
+  ];
+
   sheet.getRow(1).font = { bold: true };
   sheet.getColumn(1).numFmt = "@";
   sheet.getColumn(7).numFmt = "@";
@@ -62,12 +70,35 @@ function cellText(value: { text: string }) {
   return value.text.trim();
 }
 
+type ReferenceData = {
+  sections: { section_id: number; section_name: string }[];
+  companies: { company_id: number; company_name: string }[];
+};
 function CreateStudentAccountsPage() {
   const [rows, setRows] = useState<ImportRow[]>([]);
   const [fileName, setFileName] = useState("");
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [references, setReferences] = useState<ReferenceData>({
+    sections: [],
+    companies: [],
+  });
+
+  useEffect(() => {
+    fetch("/api/reference-data")
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok)
+          throw new Error(data.error ?? "Could not load filters.");
+        setReferences(data as ReferenceData);
+      })
+      .catch((error: unknown) => {
+        setMessage(
+          error instanceof Error ? error.message : "Could not load filters.",
+        );
+      });
+  });
 
   const readSpreadsheet = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -93,7 +124,9 @@ function CreateStudentAccountsPage() {
         (header) => !columnByHeader.has(normalizeHeader(header)),
       );
       if (missingHeaders.length) {
-        throw new Error(`Missing template columns: ${missingHeaders.join(", ")}`);
+        throw new Error(
+          `Missing template columns: ${missingHeaders.join(", ")}`,
+        );
       }
 
       const importedRows: ImportRow[] = [];
@@ -114,13 +147,18 @@ function CreateStudentAccountsPage() {
         }
         if (Object.values(row).some(Boolean)) importedRows.push(row);
       }
-      if (!importedRows.length) throw new Error("The worksheet has no student rows.");
+      if (!importedRows.length)
+        throw new Error("The worksheet has no student rows.");
       setRows(importedRows);
       setIsError(false);
       setMessage(`${importedRows.length} student row(s) ready to import.`);
     } catch (error) {
       setIsError(true);
-      setMessage(error instanceof Error ? error.message : "Could not read the spreadsheet.");
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Could not read the spreadsheet.",
+      );
     }
   };
 
@@ -137,20 +175,21 @@ function CreateStudentAccountsPage() {
         body: JSON.stringify({ rows }),
       });
       const result = await response.json();
-      if (!response.ok) throw new Error(result.error ?? "Student accounts could not be created.");
+      if (!response.ok)
+        throw new Error(
+          result.error ?? "Student accounts could not be created.",
+        );
 
       const accounts = result.accounts as CreatedAccount[];
       const { Workbook } = await import("exceljs");
       const workbook = new Workbook();
       const worksheet = workbook.addWorksheet("Created Accounts");
       worksheet.columns = [
-        { header: "user_id", key: "user_id", width: 12 },
         { header: "Username", key: "username", width: 22 },
         { header: "Temporary Password", key: "temporaryPassword", width: 26 },
-        { header: "section_id", key: "section_id", width: 12 },
-        { header: "company_id", key: "company_id", width: 12 },
+        { header: "Section", key: "section_name", width: 15 },
+        { header: "Company", key: "company_name", width: 15 },
         { header: "contact_number", key: "contact_number", width: 18 },
-        { header: "access_id", key: "access_id", width: 12 },
       ];
       worksheet.getColumn(6).numFmt = "@";
       worksheet.addRows(accounts);
@@ -159,10 +198,16 @@ function CreateStudentAccountsPage() {
       setRows([]);
       setFileName("");
       setIsError(false);
-      setMessage(`Created ${accounts.length} account(s). Downloaded student-accounts.xlsx with temporary passwords.`);
+      setMessage(
+        `Created ${accounts.length} account(s). Downloaded student-accounts.xlsx with temporary passwords.`,
+      );
     } catch (error) {
       setIsError(true);
-      setMessage(error instanceof Error ? error.message : "Student accounts could not be created.");
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Student accounts could not be created.",
+      );
     } finally {
       setBusy(false);
     }
@@ -177,14 +222,53 @@ function CreateStudentAccountsPage() {
       <div className="dashboard-section">
         <h2 className="dashboard-section-title">Import from spreadsheet</h2>
         <p className="dashboard-section-sub">
-          Use the supplied template. Section and company names must match reference data.
-          Temporary password is the last four LRN digits followed by the student&apos;s
-          lowercase last name without spaces. LRN and names are used only during import
-          and are not saved to the database.
+          Use the supplied template. Section and company names must match
+          reference data. Temporary password is the last four LRN digits
+          followed by the student&apos;s lowercase last name without spaces. LRN
+          and names are used only during import and are not saved to the
+          database.
         </p>
         <p className="dashboard-section-sub">
-          The account workbook is downloaded after creation; share temporary passwords
-          securely with students.
+          These are the list of available Companies and Sections
+        </p>
+        <div className="table-grid-container">
+          <div className="table-wrap">
+            <table className="placeholder-table">
+              <thead>
+                <tr>
+                  <th scope="col">Company</th>
+                </tr>
+              </thead>
+              <tbody>
+                {references.companies.map((record, index) => (
+                  <tr key={index}>
+                    <td>{record.company_name}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="table-wrap">
+            <table className="placeholder-table">
+              <thead>
+                <tr>
+                  <th scope="col">Section</th>
+                </tr>
+              </thead>
+              <tbody>
+                {references.sections.map((record, index) => (
+                  <tr key={index}>
+                    <td>{record.section_name}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <p className="dashboard-section-sub">
+          The account workbook is downloaded after creation; share temporary
+          passwords securely with students.
         </p>
       </div>
       <div className="dashboard-inline-actions">
@@ -194,7 +278,11 @@ function CreateStudentAccountsPage() {
           onClick={() => {
             void downloadTemplate().catch((error: unknown) => {
               setIsError(true);
-              setMessage(error instanceof Error ? error.message : "Template could not be downloaded.");
+              setMessage(
+                error instanceof Error
+                  ? error.message
+                  : "Template could not be downloaded.",
+              );
             });
           }}
         >
@@ -210,11 +298,14 @@ function CreateStudentAccountsPage() {
           />
         </label>
       </div>
-      {fileName ? <p className="dashboard-section-sub">Selected: {fileName}</p> : null}
+      {fileName ? (
+        <p className="dashboard-section-sub">Selected: {fileName}</p>
+      ) : null}
       {rows.length ? (
         <form className="dashboard-form" onSubmit={createAccounts}>
           <p className="dashboard-section-sub">
-            Ready to create {rows.length} account(s). Blank Middle Name values are allowed.
+            Ready to create {rows.length} account(s). Blank Middle Name values
+            are allowed.
           </p>
           <SimpleButton type="submit" disabled={busy}>
             {busy ? "Creating Accounts..." : "Create Accounts & Download XLSX"}
@@ -222,7 +313,14 @@ function CreateStudentAccountsPage() {
         </form>
       ) : null}
       {message ? (
-        <p className={isError ? "dashboard-message dashboard-message--error" : "dashboard-message"} role="status">
+        <p
+          className={
+            isError
+              ? "dashboard-message dashboard-message--error"
+              : "dashboard-message"
+          }
+          role="status"
+        >
           {message}
         </p>
       ) : null}

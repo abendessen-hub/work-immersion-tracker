@@ -20,23 +20,10 @@ type ReferenceData = {
   companies: { company_id: number; company_name: string }[];
 };
 
-function manilaToday() {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "Asia/Manila",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date());
-  const value = Object.fromEntries(
-    parts.map((part) => [part.type, part.value]),
-  );
-  return `${value.year}-${value.month}-${value.day}`;
-}
-
 function AttendancePage() {
   const { user } = useAuth();
   const isStudent = user?.accessId === 1;
-  const [date, setDate] = useState(manilaToday);
+  const [date, setDate] = useState(null);
   const [sectionId, setSectionId] = useState("");
   const [companyId, setCompanyId] = useState("");
   const [references, setReferences] = useState<ReferenceData>({
@@ -163,7 +150,6 @@ function AttendancePage() {
           <span className="stat-value">{busy ? "…" : completedCount}</span>
         </div>
       </div>
-
       <section className="dashboard-section" aria-label="Attendance filters">
         <h2 className="dashboard-section-title">Report filters</h2>
         <div className="attendance-filters">
@@ -232,7 +218,6 @@ function AttendancePage() {
           </SimpleButton>
         </div>
       </section>
-
       {message ? (
         <p className="dashboard-message dashboard-message--error" role="status">
           {message}
