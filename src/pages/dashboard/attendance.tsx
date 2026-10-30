@@ -20,10 +20,24 @@ type ReferenceData = {
   companies: { company_id: number; company_name: string }[];
 };
 
+function formatTo12Hour(timeStr: string) {
+  if (!timeStr) return "";
+  const [hourStr, minuteStr] = timeStr.split(":");
+  let hours = parseInt(hourStr, 10);
+  if (isNaN(hours)) return timeStr;
+
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  const minutes = minuteStr ? minuteStr.slice(0, 2) : "00";
+
+  return `${String(hours).padStart(2, "0")}:${minutes} ${ampm}`;
+}
+
 function AttendancePage() {
   const { user } = useAuth();
   const isStudent = user?.accessId === 1;
-  const [date, setDate] = useState(null);
+  const [date, setDate] = useState("");
   const [sectionId, setSectionId] = useState("");
   const [companyId, setCompanyId] = useState("");
   const [references, setReferences] = useState<ReferenceData>({
@@ -103,7 +117,8 @@ function AttendancePage() {
       worksheet.addRows(
         records.map((record) => ({
           ...record,
-          time_out: record.time_out ?? "",
+          time_in: formatTo12Hour(record.time_in),
+          time_out: record.time_out ? formatTo12Hour(record.time_out) : "",
           date: new Date(record.date).toLocaleDateString(),
         })),
       );
@@ -251,8 +266,10 @@ function AttendancePage() {
                   <td>{record.section_name}</td>
                   <td>{record.company_name}</td>
                   <td>{new Date(record.date).toLocaleDateString()}</td>
-                  <td>{record.time_in}</td>
-                  <td>{record.time_out ?? "—"}</td>
+                  <td>{formatTo12Hour(record.time_in)}</td>
+                  <td>
+                    {record.time_out ? formatTo12Hour(record.time_out) : "—"}
+                  </td>
                 </tr>
               ))}
             </tbody>
