@@ -41,8 +41,6 @@ ALTER TABLE users ALTER COLUMN full_name SET NOT NULL;
 CREATE TABLE IF NOT EXISTS attendance_record (
   record_id SERIAL PRIMARY KEY,
   user_id INTEGER NOT NULL REFERENCES users(user_id),
-  section_id INTEGER NOT NULL REFERENCES section_reference(section_id),
-  company_id INTEGER NOT NULL REFERENCES company_reference(company_id),
   date DATE NOT NULL,
   time_in TIME NOT NULL,
   time_out TIME

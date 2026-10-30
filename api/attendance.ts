@@ -47,8 +47,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                    a.date, a.time_in, a.time_out
             FROM attendance_record a
             JOIN users u ON u.user_id = a.user_id
-            JOIN section_reference s ON s.section_id = a.section_id
-            JOIN company_reference c ON c.company_id = a.company_id
+            JOIN section_reference s ON s.section_id = u.section_id
+            JOIN company_reference c ON c.company_id = u.company_id
             WHERE a.user_id = ${session.userId}
               AND (${date}::date IS NULL OR a.date >= ${date}::date)
             ORDER BY a.date DESC, a.time_in DESC
@@ -143,9 +143,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           FOR UPDATE
         ),
         inserted AS (
-          INSERT INTO attendance_record (user_id, section_id, company_id, date, time_in)
+          INSERT INTO attendance_record (user_id, date, time_in)
           SELECT
-            ${user.user_id}, ${user.section_id}, ${user.company_id},
+            ${user.user_id},
             (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Manila')::date,
             (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Manila')::time
           WHERE NOT EXISTS (SELECT 1 FROM existing)
