@@ -48,8 +48,6 @@ CREATE TABLE IF NOT EXISTS attendance_record (
 
 CREATE INDEX IF NOT EXISTS idx_attendance_user_date
   ON attendance_record(user_id, date);
-CREATE INDEX IF NOT EXISTS idx_attendance_section_date
-  ON attendance_record(section_id, date);
 CREATE INDEX IF NOT EXISTS idx_attendance_date
   ON attendance_record(date);
 CREATE INDEX IF NOT EXISTS idx_users_section
