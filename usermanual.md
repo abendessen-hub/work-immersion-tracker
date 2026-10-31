@@ -35,16 +35,16 @@ The **Work Immersion Monitoring System (WIMS)** is a centralized web platform bu
 
 WIMS assigns system capabilities based on three hierarchical access levels. A checkmark (`Yes`) indicates the module is visible on the user's Dashboard.
 
-| System Capability / Module | Student (Level 1) | Teacher (Level 2) | Admin (Level 3) |
-| :--- | :---: | :---: | :---: |
-| **Sign In & Session Management** | Yes | Yes | Yes |
-| **Mandatory First-Time Password Reset** | Yes | No | No |
-| **Scan QR** (Log Daily Time In / Time Out) | Yes | No | No |
-| **Attendance** (Personal History & Export) | Yes | No | No |
-| **Attendance** (All Students, Filters & Export) | No | Yes | Yes |
-| **Create Student Accounts** (Bulk `.xlsx` Import) | No | Yes | Yes |
-| **Generate QR** (Partner Company PNGs) | No | No | Yes |
-| **Create Teacher Accounts** | No | No | Yes |
+| System Capability / Module | Student (Level 1) | Teacher (Level 2) | Admin (Level 3) | | Deployer (Level 4)
+| :--- | :---: | :---: | :---: | :---: |
+| **Sign In & Session Management** | Yes | Yes | Yes | Yes |
+| **Mandatory First-Time Password Reset** | Yes | No | No |  No |
+| **Scan QR** (Log Daily Time In / Time Out) | Yes | No | No | No |
+| **Attendance** (Personal History & Export) | Yes | No | No | No |
+| **Attendance** (All Students, Filters & Export) | No | Yes | Yes | Yes |
+| **Create Student Accounts** (Bulk `.xlsx` Import) | No | Yes | Yes | No |
+| **Generate QR** (Partner Company PNGs) | No | No | Yes | Yes |
+| **Create Teacher Accounts** | No | No | Yes | No |
 
 ---
 
