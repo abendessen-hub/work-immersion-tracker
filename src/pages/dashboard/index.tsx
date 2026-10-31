@@ -11,7 +11,7 @@ import BadgeIcon from "@mui/icons-material/Badge";
 const actions = [
   {
     title: "Scan QR",
-    description: "Record trainee attendance via camera",
+    description: "Record daily trainee time-in and time-out via camera.",
     tag: "All roles",
     to: "/dashboard/scan-qr",
     icon: <QrCodeScannerIcon />,
@@ -20,7 +20,7 @@ const actions = [
   },
   {
     title: "Generate QR",
-    description: "Generate a unique QR Code PNGs for companies",
+    description: "Create and download official check-in QR codes for companies.",
     tag: "Admin",
     accessLevels: [3],
     icon: <QrCode2Icon />,
@@ -28,7 +28,7 @@ const actions = [
   },
   {
     title: "Attendance",
-    description: "View live attendance progress, charts, and records",
+    description: "Monitor live attendance records, metrics, and Excel exports.",
     tag: "All roles",
     accessLevels: [1, 2, 3],
     icon: <InsightsIcon />,
@@ -36,7 +36,7 @@ const actions = [
   },
   {
     title: "Create Student Accounts",
-    description: "Create accounts for students using Spreadsheets",
+    description: "Bulk import student accounts using the Excel template.",
     tag: "Teacher",
     accessLevels: [2, 3],
     icon: <GroupAddIcon />,
@@ -44,7 +44,7 @@ const actions = [
   },
   {
     title: "Create Teacher Accounts",
-    description: "Create accounts for teachers using this site",
+    description: "Provision new Work Immersion teacher credentials.",
     tag: "Admin",
     accessLevels: [3],
     icon: <BadgeIcon />,
@@ -59,7 +59,7 @@ function DashboardPage() {
     <DashboardLayout
       eyebrow="Dashboard"
       title="Work Immersion Monitoring System (WIMS)"
-      description={`Welcome back, ${user?.fullname}. Pick an action below to get started.`}
+      description={`Welcome back, ${user?.fullname || "User"}. Select a module below to manage immersion operations.`}
       back={false}
       logout={true}
     >

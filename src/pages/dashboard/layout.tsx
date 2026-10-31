@@ -12,6 +12,12 @@ type DashboardLayoutProps = {
   children: ReactNode;
 };
 
+const roleLabelById: Record<number, string> = {
+  1: "Student",
+  2: "Teacher",
+  3: "Admin",
+};
+
 function DashboardLayout({
   eyebrow = "Work Immersion Monitoring System (WIMS)",
   title,
@@ -21,7 +27,7 @@ function DashboardLayout({
   children,
 }: DashboardLayoutProps) {
   const navigate = useNavigate();
-  const { logout: callLogout } = useAuth();
+  const { user, logout: callLogout } = useAuth();
   const [logoutMessage, setLogoutMessage] = useState("Log Out");
   const handleLogout = () => {
     setLogoutMessage("Logging out...");
@@ -30,11 +36,21 @@ function DashboardLayout({
       navigate("/");
     });
   };
+  const roleLabel = user ? (roleLabelById[user.accessId] ?? "Member") : null;
+
   return (
     <section className="dashboard-card">
       <div className="dashboard-header">
-        <div>
-          <p className="eyebrow">{eyebrow}</p>
+        <div className="dashboard-header-copy">
+          <div className="dashboard-eyebrow-row">
+            <span className="eyebrow-pill">
+              <span className="eyebrow-dot" aria-hidden="true" />
+              {eyebrow}
+            </span>
+            {roleLabel ? (
+              <span className="role-pill">{roleLabel} Portal</span>
+            ) : null}
+          </div>
           <h1 className="dashboard-title">{title}</h1>
           {description ? (
             <p className="dashboard-description">{description}</p>
@@ -44,10 +60,10 @@ function DashboardLayout({
           {back ? (
             <button
               type="button"
-              className="logout-btn"
+              className="logout-btn logout-btn--ghost"
               onClick={() => navigate("/dashboard")}
             >
-              Back
+              ← Back
             </button>
           ) : null}
           {logout ? (
