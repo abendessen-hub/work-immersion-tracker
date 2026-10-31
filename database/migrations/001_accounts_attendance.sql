@@ -5,7 +5,18 @@ CREATE TABLE IF NOT EXISTS access_reference (
 
 CREATE TABLE IF NOT EXISTS company_reference (
   company_id SERIAL PRIMARY KEY,
-  company_name TEXT NOT NULL
+  company_name TEXT NOT NULL,
+  longitude DOUBLE PRECISION,
+  latitude DOUBLE PRECISION,
+  radius_meters INTEGER NOT NULL DEFAULT 100,
+  CONSTRAINT company_reference_latitude_range
+    CHECK (latitude IS NULL OR latitude BETWEEN -90 AND 90),
+  CONSTRAINT company_reference_longitude_range
+    CHECK (longitude IS NULL OR longitude BETWEEN -180 AND 180),
+  CONSTRAINT company_reference_location_pair
+    CHECK ((latitude IS NULL) = (longitude IS NULL)),
+  CONSTRAINT company_reference_radius_positive
+    CHECK (radius_meters > 0)
 );
 
 CREATE TABLE IF NOT EXISTS immersion_teacher (

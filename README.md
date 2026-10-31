@@ -100,14 +100,21 @@ vercel --prod
 
 Before using spreadsheet account creation, QR check-in, or attendance reports, run
 [`database/migrations/001_accounts_attendance.sql`](./database/migrations/001_accounts_attendance.sql)
-against the Neon database configured by `DATABASE_URL`. It creates the reference
+and [`database/migrations/002_company_geofence.sql`](./database/migrations/002_company_geofence.sql)
+against the Neon database configured by `DATABASE_URL`. The first migration creates the reference
 tables `access_reference`, `company_reference`, `immersion_teacher`, and
 `section_reference`, along with `users` and `attendance_record` matching the
-provided Neon schema. Existing tables are not altered.
+provided Neon schema. The second migration adds company geofence coordinates and
+radius, including for databases created before location checks were added.
 
 Add reference rows to `section_reference(section_name)` and
 `company_reference(company_name)` before importing students. Section/company names
 in the workbook match those references without case sensitivity.
+Use **Manage References** as an admin to create or update companies, set each
+company's coordinates (manually or from the current device location), and choose
+its allowed check-in radius. Student QR check-ins require device location access
+and are rejected if the reported location falls outside that radius. Geolocation
+requires HTTPS except on localhost.
 `immersion_teacher` is a separate reference entity; it does not create or grant a
 teacher login. Access role IDs are looked up by name from `access_reference`.
 

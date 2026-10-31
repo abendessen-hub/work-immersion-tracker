@@ -19,6 +19,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     typeof body.fullName === "string" ? body.fullName.trim() : "";
   const username =
     typeof body.username === "string" ? body.username.trim().toLowerCase() : "";
+  const companyName =
+    typeof body.company === "string" ? body.company.trim().toLowerCase() : "";
+  const sectionName =
+    typeof body.section === "string" ? body.section.trim().toLowerCase() : "";
   const password = typeof body.password === "string" ? body.password : "";
   const contactNumber =
     typeof body.contactNumber === "string" ? body.contactNumber.trim() : "";
@@ -33,9 +37,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const teacherAccess = await sql`
+    const [teacherAccess, sectionExists, companyExists] = await Promise.all([
+      sql`
       SELECT access_id FROM access_reference WHERE lower(access_name) = 'teacher'
-    `;
+    `,
+      sql`SELECT section_id FROM section_reference WHERE lower(section_name) = ${sectionName}`,
+      sql`SELECT company_id FROM company_reference WHERE lower(company_name) = ${companyName}`,
+      ,
+    ]);
+
+    if (!sectionExists.length) {
+      return res.status(400).json({
+        error: `Section "${sectionName}" was not found.`,
+      });
+    }
+    if (!companyExists.length) {
+      return res.status(400).json({
+        error: `Company "${companyName}" was not found.`,
+      });
+    }
+
     if (!teacherAccess.length) {
       return res.status(500).json({
         error: "Teacher access role is missing from access_reference",
@@ -52,7 +73,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       INSERT INTO users
         (username, full_name, password, access_id, section_id, company_id, "changedPassword", contact_number)
       VALUES
-        (${username}, ${fullName}, ${passwordHash}, ${teacherAccess[0].access_id}, NULL, NULL, true, ${contactNumber})
+        (${username}, ${fullName}, ${passwordHash}, ${teacherAccess[0].access_id}, ${sectionExists[0].section_id}, ${companyExists[0].company_id}, true, ${contactNumber})
       RETURNING user_id, username, full_name, access_id
     `;
 

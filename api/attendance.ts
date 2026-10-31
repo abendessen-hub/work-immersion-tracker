@@ -21,6 +21,44 @@ function optionalId(value: unknown): number | null | undefined {
   return isPositiveInteger(parsed) ? parsed : undefined;
 }
 
+function validCoordinate(
+  value: unknown,
+  min: number,
+  max: number,
+): value is number {
+  return (
+    typeof value === "number" &&
+    Number.isFinite(value) &&
+    value >= min &&
+    value <= max
+  );
+}
+
+function distanceInMeters(
+  latitude1: number,
+  longitude1: number,
+  latitude2: number,
+  longitude2: number,
+): number {
+  const radians = (degrees: number) => (degrees * Math.PI) / 180;
+  const latitudeDelta = radians(latitude2 - latitude1);
+  const longitudeDelta = radians(longitude2 - longitude1);
+  const haversine =
+    Math.sin(latitudeDelta / 2) ** 2 +
+    Math.cos(radians(latitude1)) *
+      Math.cos(radians(latitude2)) *
+      Math.sin(longitudeDelta / 2) ** 2;
+  const clampedHaversine = Math.min(1, Math.max(0, haversine));
+  return (
+    6_371_000 *
+    2 *
+    Math.atan2(
+      Math.sqrt(clampedHaversine),
+      Math.sqrt(1 - clampedHaversine),
+    )
+  );
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const session = getSession(req);
   if (!session) return res.status(401).json({ error: "Please sign in first" });
@@ -97,14 +135,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!isPositiveInteger(companyId)) {
     return res.status(400).json({ error: "Invalid company QR code" });
   }
+  const location = req.body?.location;
+  if (
+    typeof location !== "object" ||
+    location === null ||
+    !validCoordinate(location.latitude, -90, 90) ||
+    !validCoordinate(location.longitude, -180, 180) ||
+    typeof location.accuracy !== "number" ||
+    !Number.isFinite(location.accuracy) ||
+    location.accuracy < 0
+  ) {
+    return res
+      .status(400)
+      .json({ error: "A valid device location is required" });
+  }
 
   try {
-    // student attedance
     const users = await sql`
       SELECT u.user_id, u.access_id, u.section_id,
-             COALESCE(u.company_id, s.company_id) AS company_id
+             COALESCE(u.company_id, s.company_id) AS company_id,
+             c.latitude, c.longitude, c.radius_meters
       FROM users u
       LEFT JOIN section_reference s ON s.section_id = u.section_id
+      LEFT JOIN company_reference c
+        ON c.company_id = COALESCE(u.company_id, s.company_id)
       WHERE u.user_id = ${session.userId}
     `;
     const user = users[0];
@@ -116,6 +170,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (Number(user.company_id) !== companyId) {
       return res.status(403).json({
         error: "This company QR does not match your assigned company",
+      });
+    }
+
+    const latitude = Number(user.latitude);
+    const longitude = Number(user.longitude);
+    const radiusMeters = Number(user.radius_meters);
+    if (
+      user.latitude == null ||
+      user.longitude == null ||
+      !validCoordinate(latitude, -90, 90) ||
+      !validCoordinate(longitude, -180, 180) ||
+      !Number.isFinite(radiusMeters) ||
+      radiusMeters <= 0
+    ) {
+      return res.status(409).json({
+        error:
+          "Your assigned company has no valid check-in location. Contact an administrator.",
+      });
+    }
+
+    if (location.accuracy > radiusMeters) {
+      return res.status(400).json({
+        error:
+          "Location accuracy is too low. Move to an area with a stronger GPS signal and try again.",
+      });
+    }
+
+    const distance = distanceInMeters(
+      location.latitude,
+      location.longitude,
+      latitude,
+      longitude,
+    );
+    if (distance > radiusMeters) {
+      return res.status(403).json({
+        error: `You are outside your company check-in area (${Math.ceil(distance)} m away; allowed radius ${radiusMeters} m).`,
       });
     }
 

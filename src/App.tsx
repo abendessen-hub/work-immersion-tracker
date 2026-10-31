@@ -10,6 +10,7 @@ import {
 import SimpleButton from "./components/simple-button";
 import DashboardPage from "./pages/dashboard";
 import ScanQrPage from "./pages/dashboard/scan-qr";
+import ManageReferences from "./pages/dashboard/manage-references";
 import GenerateQrPage from "./pages/dashboard/generate-qr";
 import AttendancePage from "./pages/dashboard/attendance";
 import CreateStudentAccountsPage from "./pages/dashboard/create-student-accounts";
@@ -403,6 +404,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <ScanQrPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/manage-references"
+          element={
+            <ProtectedRoute>
+              <ManageReferences />
             </ProtectedRoute>
           }
         />

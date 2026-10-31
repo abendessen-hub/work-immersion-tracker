@@ -3,6 +3,7 @@ import { useAuth } from "../../context/useAuth";
 import DashboardLayout from "./layout";
 import ActionCard from "../../components/action-card";
 import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
+import ManageAccounts from "@mui/icons-material/ManageAccounts";
 import QrCode2Icon from "@mui/icons-material/QrCode2";
 import InsightsIcon from "@mui/icons-material/Insights";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
@@ -19,8 +20,18 @@ const actions = [
     active: true,
   },
   {
+    title: "Manage References",
+    description: "Manage company check-in locations and access references.",
+    tag: "Admin",
+    to: "/dashboard/manage-references",
+    icon: <ManageAccounts />,
+    accessLevels: [3],
+    active: true,
+  },
+  {
     title: "Generate QR",
-    description: "Create and download official check-in QR codes for companies.",
+    description:
+      "Create and download official check-in QR codes for companies.",
     tag: "Admin",
     accessLevels: [3],
     icon: <QrCode2Icon />,

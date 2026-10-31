@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Html5Qrcode as Html5QrcodeInstance } from "html5-qrcode";
 import { useAuth } from "../../context/useAuth";
+import { getCurrentLocation } from "../../lib/geolocation";
 import DashboardLayout from "./layout";
 import SimpleButton from "../../components/simple-button";
 
@@ -36,10 +37,11 @@ function ScanQrPage() {
       throw new Error("This QR code is not a company check-in code.");
     }
 
+    const location = await getCurrentLocation();
     const response = await fetch("/api/attendance", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ companyId }),
+      body: JSON.stringify({ companyId, location }),
     });
     const result = await response.json();
     if (!response.ok)
@@ -141,7 +143,8 @@ function ScanQrPage() {
             <h2 className="dashboard-section-title">Camera scanner</h2>
             <p className="dashboard-section-sub">
               First scan records time in; the next scan records time out. A
-              company code that does not match your account will be rejected.
+              company code that does not match your account or location will be
+              rejected. Allow location access when prompted.
             </p>
             <div className="dashboard-inline-actions">
               <SimpleButton
