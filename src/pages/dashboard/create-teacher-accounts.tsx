@@ -59,7 +59,7 @@ function CreateTeacherAccountsPage() {
           label="Username"
           id="teacher-username"
           autoFocus={false}
-          placeholder="Last 4 of LRN + last name (e.g., 1234cubol)"
+          placeholder="Will based on your name (eg, henrich_123)"
           value={values.username}
           onChange={(event) => setValues({ ...values, username: event.target.value })}
         />
