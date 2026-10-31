@@ -1,10 +1,10 @@
-import { useAuth } from "../../context/useAuth";
+//import { useAuth } from "../../context/useAuth";
 import DashboardLayout from "./layout";
 
 //const allowedAccess = { admin: 3 };
 
 function ManageAccounts() {
-  const { user } = useAuth();
+  //const { user } = useAuth();
   //const isAdmin = user?.accessId === allowedAccess.admin;
 
   return (
