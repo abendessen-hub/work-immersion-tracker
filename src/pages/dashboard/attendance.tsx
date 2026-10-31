@@ -37,6 +37,7 @@ function formatTo12Hour(timeStr: string) {
 function AttendancePage() {
   const { user } = useAuth();
   const isStudent = user?.accessId === 1;
+  const isTeacher = user?.accessId === 2;
   const [date, setDate] = useState("");
   const [sectionId, setSectionId] = useState("");
   const [companyId, setCompanyId] = useState("");
@@ -56,6 +57,20 @@ function AttendancePage() {
         if (!response.ok)
           throw new Error(data.error ?? "Could not load filters.");
         setReferences(data as ReferenceData);
+        if (isTeacher) {
+          setSectionId(
+            data.find(
+              (d: ReferenceData["sections"][number]) =>
+                d.section_id === user?.sectionId,
+            ),
+          );
+          setCompanyId(
+            data.find(
+              (d: ReferenceData["companies"][number]) =>
+                d.company_id === user?.companyId,
+            ),
+          );
+        }
       })
       .catch((error: unknown) => {
         setMessage(
@@ -193,11 +208,19 @@ function AttendancePage() {
                   }}
                 >
                   <option value="">All sections</option>
-                  {references.sections.map((section) => (
-                    <option key={section.section_id} value={section.section_id}>
-                      {section.section_name}
-                    </option>
-                  ))}
+                  {references.sections.map((section) => {
+                    if (user?.sectionId != section.section_id && isTeacher) {
+                      return <></>;
+                    }
+                    return (
+                      <option
+                        key={section.section_id}
+                        value={section.section_id}
+                      >
+                        {section.section_name}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
               <div className="form-field">
@@ -211,11 +234,19 @@ function AttendancePage() {
                   }}
                 >
                   <option value="">All companies</option>
-                  {references.companies.map((company) => (
-                    <option key={company.company_id} value={company.company_id}>
-                      {company.company_name}
-                    </option>
-                  ))}
+                  {references.companies.map((company) => {
+                    if (user?.companyId != company.company_id && isTeacher) {
+                      return <></>;
+                    }
+                    return (
+                      <option
+                        key={company.company_id}
+                        value={company.company_id}
+                      >
+                        {company.company_name}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
             </>
