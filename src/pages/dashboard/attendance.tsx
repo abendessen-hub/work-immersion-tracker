@@ -135,7 +135,7 @@ function AttendancePage() {
 
   return (
     <DashboardLayout
-      eyebrow="Dashboard · Attendance"
+      eyebrow="Work Immersion Monitoring System (WIMS) · Attendance"
       title="Attendance"
       description={
         isStudent

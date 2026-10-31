@@ -215,7 +215,7 @@ function CreateStudentAccountsPage() {
 
   return (
     <DashboardLayout
-      eyebrow="Dashboard · Create Accounts"
+      eyebrow="Work Immersion Monitoring System (WIMS) · Create Accounts"
       title="Create Accounts"
       description="Teacher only. Create accounts for students using Spreadsheets."
     >

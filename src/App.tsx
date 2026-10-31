@@ -201,7 +201,7 @@ function LoginPage() {
   return (
     <div className="login-layout">
       <section className="login-card" aria-labelledby="login-title">
-        <p className="eyebrow">Work Immersion Tracker: W.I.T</p>
+        <p className="eyebrow">Work Immersion Monitoring System (WIMS)</p>
         <h1 id="login-title">Sign in</h1>
 
         <form className="login-form" onSubmit={handleSubmit}>
@@ -460,13 +460,12 @@ function AppContent() {
             <img
               className="footer-school-logo"
               src={SchoolLogo}
-              role="img"
-              aria-label="School logo placeholder"
+              alt="Luis Y. Ferrer Jr. Senior High School logo"
             />
             <div className="footer-school-details">
               <span className="footer-school-label">School partner</span>
               <span className="footer-school-name">
-                Luis Y. Ferror Jr. Senior High School
+                Luis Y. Ferrer Jr. Senior High School
               </span>
             </div>
           </div>

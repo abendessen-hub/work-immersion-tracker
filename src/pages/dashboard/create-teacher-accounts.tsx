@@ -40,7 +40,7 @@ function CreateTeacherAccountsPage() {
 
   return (
     <DashboardLayout
-      eyebrow="Dashboard · Create Account"
+      eyebrow="Work Immersion Monitoring System (WIMS) · Create Account"
       title="Create Account"
       description="Admin only. Create accounts for teachers using this site."
     >

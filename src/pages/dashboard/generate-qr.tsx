@@ -74,7 +74,7 @@ function GenerateQrPage() {
 
   return (
     <DashboardLayout
-      eyebrow="Dashboard · Generate QR"
+      eyebrow="Work Immersion Monitoring System (WIMS) · Generate QR"
       title="Generate QR"
       description="Generate a unique company check-in QR Code PNG."
     >

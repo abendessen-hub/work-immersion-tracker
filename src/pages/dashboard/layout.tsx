@@ -13,7 +13,7 @@ type DashboardLayoutProps = {
 };
 
 function DashboardLayout({
-  eyebrow = "Dashboard",
+  eyebrow = "Work Immersion Monitoring System (WIMS)",
   title,
   description,
   back = true,

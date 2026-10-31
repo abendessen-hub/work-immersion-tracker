@@ -1,4 +1,4 @@
-# Work Immersion Tracker
+# Work Immersion Monitoring System (WIMS)
 
 A React and TypeScript single-page app built with Vite.
 

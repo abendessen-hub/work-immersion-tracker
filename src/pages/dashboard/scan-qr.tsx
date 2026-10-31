@@ -131,7 +131,7 @@ function ScanQrPage() {
 
   return (
     <DashboardLayout
-      eyebrow="Dashboard · Scan QR"
+      eyebrow="Work Immersion Monitoring System (WIMS) · Scan QR"
       title="Scan QR"
       description="Scan your assigned company QR while signed in to record your own attendance."
     >

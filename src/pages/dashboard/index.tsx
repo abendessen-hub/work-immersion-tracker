@@ -48,7 +48,7 @@ function DashboardPage() {
   return (
     <DashboardLayout
       eyebrow="Dashboard"
-      title="Work Immersion Tracker"
+      title="Work Immersion Monitoring System (WIMS)"
       description={`Welcome back. ${user?.fullname} Pick an action below to get started.`}
       back={false}
       logout={true}
