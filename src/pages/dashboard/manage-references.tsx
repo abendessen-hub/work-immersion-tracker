@@ -48,10 +48,12 @@ const emptyCompany: CompanyValues = {
   companyName: "",
   latitude: "",
   longitude: "",
-  radiusMeters: "100",
+  radiusMeters: "20",
 };
 
 const emptySection: SectionValues = { sectionName: "", companyId: "" };
+
+const allowedAccess = { admin: 3, deployer: 4 };
 
 async function sendReference(method: string, values: object) {
   const response = await fetch("/api/reference", {
@@ -68,7 +70,8 @@ async function sendReference(method: string, values: object) {
 
 function ManageReferences() {
   const { user } = useAuth();
-  const isAdmin = user?.accessId === 3;
+  const isAdmin = user?.accessId === allowedAccess.admin;
+  const isDeployer = user?.accessId === allowedAccess.deployer;
   const [companies, setCompanies] = useState<Company[]>([]);
   const [accessReferences, setAccessReferences] = useState<AccessReference[]>(
     [],
@@ -100,7 +103,7 @@ function ManageReferences() {
   }, []);
 
   useEffect(() => {
-    if (!isAdmin) return;
+    if (!(isAdmin || isDeployer)) return;
     loadReferences()
       .then((result) => {
         setCompanies(result.companies);
@@ -114,7 +117,7 @@ function ManageReferences() {
         );
       })
       .finally(() => setLoading(false));
-  }, [isAdmin, loadReferences]);
+  }, [isAdmin, isDeployer, loadReferences]);
 
   const useCurrentLocation = async () => {
     setLocationBusy(true);
@@ -127,7 +130,9 @@ function ManageReferences() {
         longitude: location.longitude.toFixed(7),
       }));
       setIsError(false);
-      setMessage(`Location set from this device (±${Math.ceil(location.accuracy)} m accuracy).`);
+      setMessage(
+        `Location set from this device (±${Math.ceil(location.accuracy)} m accuracy).`,
+      );
     } catch (error) {
       setIsError(true);
       setMessage(
@@ -148,9 +153,7 @@ function ManageReferences() {
         editingCompanyId === null ? "POST" : "PUT",
         {
           referenceType: "company",
-          ...(editingCompanyId === null
-            ? {}
-            : { companyId: editingCompanyId }),
+          ...(editingCompanyId === null ? {} : { companyId: editingCompanyId }),
           companyName: companyValues.companyName,
           latitude: Number(companyValues.latitude),
           longitude: Number(companyValues.longitude),
@@ -247,9 +250,7 @@ function ManageReferences() {
         editingSectionId === null ? "POST" : "PUT",
         {
           referenceType: "section",
-          ...(editingSectionId === null
-            ? {}
-            : { sectionId: editingSectionId }),
+          ...(editingSectionId === null ? {} : { sectionId: editingSectionId }),
           sectionName: sectionValues.sectionName,
           companyId: sectionValues.companyId
             ? Number(sectionValues.companyId)
@@ -260,19 +261,15 @@ function ManageReferences() {
         ...result.section,
         company_name:
           companies.find(
-            (company) =>
-              company.company_id === result.section.company_id,
+            (company) => company.company_id === result.section.company_id,
           )?.company_name ?? null,
         teacher_name:
-          sections.find(
-            (item) => item.section_id === result.section.section_id,
-          )?.teacher_name ?? null,
+          sections.find((item) => item.section_id === result.section.section_id)
+            ?.teacher_name ?? null,
       };
       setSections((current) =>
         [
-          ...current.filter(
-            (item) => item.section_id !== section.section_id,
-          ),
+          ...current.filter((item) => item.section_id !== section.section_id),
           section,
         ].sort((a, b) => a.section_name.localeCompare(b.section_name)),
       );
@@ -298,8 +295,7 @@ function ManageReferences() {
     setEditingSectionId(section.section_id);
     setSectionValues({
       sectionName: section.section_name,
-      companyId:
-        section.company_id === null ? "" : String(section.company_id),
+      companyId: section.company_id === null ? "" : String(section.company_id),
     });
     setMessage("");
   };
@@ -351,7 +347,9 @@ function ManageReferences() {
     } catch (error) {
       setIsError(true);
       setMessage(
-        error instanceof Error ? error.message : "Reference could not be deleted.",
+        error instanceof Error
+          ? error.message
+          : "Reference could not be deleted.",
       );
     } finally {
       setBusy(false);
@@ -364,9 +362,9 @@ function ManageReferences() {
       title="Manage References"
       description="Admin only. Manage company check-in locations and access references."
     >
-      {!isAdmin ? (
+      {!(isAdmin || isDeployer) ? (
         <p className="dashboard-message dashboard-message--error" role="status">
-          Admin access is required to manage references.
+          Admin/Deployer access is required to manage references.
         </p>
       ) : loading ? (
         <p className="dashboard-message" role="status">
@@ -380,7 +378,10 @@ function ManageReferences() {
               Each company needs a location and check-in radius before students
               can record attendance there.
             </p>
-            <form className="dashboard-form reference-form" onSubmit={submitCompany}>
+            <form
+              className="dashboard-form reference-form"
+              onSubmit={submitCompany}
+            >
               <div className="reference-form-grid">
                 <label className="form-field" htmlFor="reference-company-name">
                   Company name
@@ -459,7 +460,9 @@ function ManageReferences() {
                   onClick={useCurrentLocation}
                   disabled={busy || locationBusy}
                 >
-                  {locationBusy ? "Getting Location..." : "Use Current Location"}
+                  {locationBusy
+                    ? "Getting Location..."
+                    : "Use Current Location"}
                 </SimpleButton>
                 <SimpleButton type="submit" disabled={busy || locationBusy}>
                   {busy
@@ -488,7 +491,9 @@ function ManageReferences() {
               {companies.map((company) => (
                 <article className="reference-card" key={company.company_id}>
                   <div>
-                    <h3 className="reference-card-title">{company.company_name}</h3>
+                    <h3 className="reference-card-title">
+                      {company.company_name}
+                    </h3>
                     <p className="reference-card-detail">
                       {company.latitude == null || company.longitude == null
                         ? "Location not configured"
@@ -554,7 +559,10 @@ function ManageReferences() {
                     required
                   />
                 </label>
-                <label className="form-field" htmlFor="reference-section-company">
+                <label
+                  className="form-field"
+                  htmlFor="reference-section-company"
+                >
                   Company
                   <select
                     id="reference-section-company"
@@ -601,52 +609,55 @@ function ManageReferences() {
                 ) : null}
               </div>
             </form>
-
-            <div className="reference-list" aria-label="Section references">
-              {sections.map((section) => (
-                <article className="reference-card" key={section.section_id}>
-                  <div>
-                    <h3 className="reference-card-title">
-                      {section.section_name}
-                    </h3>
-                    <p className="reference-card-detail">
-                      {section.company_name ?? "No company assigned"}
-                      {section.teacher_name
-                        ? ` · Teacher: ${section.teacher_name}`
-                        : ""}
-                      {` · Section ID ${section.section_id}`}
-                    </p>
-                  </div>
-                  <div className="dashboard-inline-actions">
-                    <SimpleButton
-                      type="button"
-                      variant="secondary"
-                      onClick={() => editSection(section)}
-                      disabled={busy}
-                    >
-                      Edit
-                    </SimpleButton>
-                    <SimpleButton
-                      type="button"
-                      variant="secondary"
-                      onClick={() =>
-                        void deleteReference(
-                          "section",
-                          section.section_id,
-                          section.section_name,
-                        )
-                      }
-                      disabled={busy}
-                    >
-                      Delete
-                    </SimpleButton>
-                  </div>
-                </article>
-              ))}
-              {!sections.length ? (
-                <p className="dashboard-message">No section references yet.</p>
-              ) : null}
-            </div>
+            {isAdmin && (
+              <div className="reference-list" aria-label="Section references">
+                {sections.map((section) => (
+                  <article className="reference-card" key={section.section_id}>
+                    <div>
+                      <h3 className="reference-card-title">
+                        {section.section_name}
+                      </h3>
+                      <p className="reference-card-detail">
+                        {section.company_name ?? "No company assigned"}
+                        {section.teacher_name
+                          ? ` · Teacher: ${section.teacher_name}`
+                          : ""}
+                        {` · Section ID ${section.section_id}`}
+                      </p>
+                    </div>
+                    <div className="dashboard-inline-actions">
+                      <SimpleButton
+                        type="button"
+                        variant="secondary"
+                        onClick={() => editSection(section)}
+                        disabled={busy}
+                      >
+                        Edit
+                      </SimpleButton>
+                      <SimpleButton
+                        type="button"
+                        variant="secondary"
+                        onClick={() =>
+                          void deleteReference(
+                            "section",
+                            section.section_id,
+                            section.section_name,
+                          )
+                        }
+                        disabled={busy}
+                      >
+                        Delete
+                      </SimpleButton>
+                    </div>
+                  </article>
+                ))}
+                {!sections.length ? (
+                  <p className="dashboard-message">
+                    No section references yet.
+                  </p>
+                ) : null}
+              </div>
+            )}
           </section>
 
           <section className="dashboard-section reference-panel">

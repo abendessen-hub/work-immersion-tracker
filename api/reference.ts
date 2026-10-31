@@ -15,6 +15,8 @@ type SectionInput = {
   companyId: number | null;
 };
 
+const allowedAccess = { admin: 3, deployer: 4 };
+
 function requestBody(value: unknown): RequestBody {
   return typeof value === "object" && value !== null
     ? (value as RequestBody)
@@ -53,10 +55,7 @@ function companyInput(body: RequestBody): CompanyInput | null {
 function sectionInput(body: RequestBody): SectionInput | null {
   const sectionName = cleanName(body.sectionName);
   const companyId = body.companyId;
-  if (
-    !sectionName ||
-    (companyId !== null && !isPositiveInteger(companyId))
-  ) {
+  if (!sectionName || (companyId !== null && !isPositiveInteger(companyId))) {
     return null;
   }
   return { sectionName, companyId };
@@ -74,8 +73,8 @@ function isForeignKeyViolation(error: unknown): boolean {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const session = getSession(req);
   if (!session) return res.status(401).json({ error: "Please sign in first" });
-  if (session.accessId !== 3) {
-    return res.status(403).json({ error: "Admin access is required" });
+  if (!(session.accessId in allowedAccess)) {
+    return res.status(403).json({ error: "Admin/Deployer access is required" });
   }
 
   if (req.method === "GET") {
@@ -191,6 +190,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (referenceType === "access") {
       const accessId = body.accessId;
+      if (session.accessId !== allowedAccess.admin) {
+        return res.status(403).json({ error: "Admin access is required" });
+      }
       if (
         (req.method === "PUT" || req.method === "DELETE") &&
         !isPositiveInteger(accessId)
@@ -202,7 +204,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         Number(accessId) <= 3
       ) {
         return res.status(403).json({
-          error: "The built-in student, teacher, and admin roles cannot be changed or deleted",
+          error:
+            "The built-in student, teacher, and admin roles cannot be changed or deleted",
         });
       }
 
@@ -279,7 +282,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const input = sectionInput(body);
       if (!input) {
         return res.status(400).json({
-          error: "Enter a section name and select a valid company or no company",
+          error:
+            "Enter a section name and select a valid company or no company",
         });
       }
       const sectionId = body.sectionId;
@@ -294,7 +298,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           WHERE company_id = ${input.companyId}
         `;
         if (!company.length) {
-          return res.status(400).json({ error: "Selected company was not found" });
+          return res
+            .status(400)
+            .json({ error: "Selected company was not found" });
         }
       }
 

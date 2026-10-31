@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS company_reference (
   company_name TEXT NOT NULL,
   longitude DOUBLE PRECISION,
   latitude DOUBLE PRECISION,
-  radius_meters INTEGER NOT NULL DEFAULT 100,
+  radius_meters INTEGER NOT NULL DEFAULT 20,
   CONSTRAINT company_reference_latitude_range
     CHECK (latitude IS NULL OR latitude BETWEEN -90 AND 90),
   CONSTRAINT company_reference_longitude_range

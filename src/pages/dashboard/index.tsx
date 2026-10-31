@@ -3,7 +3,8 @@ import { useAuth } from "../../context/useAuth";
 import DashboardLayout from "./layout";
 import ActionCard from "../../components/action-card";
 import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
-import ManageAccounts from "@mui/icons-material/ManageAccounts";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import ContentPasteSearchIcon from "@mui/icons-material/ContentPasteSearch";
 import QrCode2Icon from "@mui/icons-material/QrCode2";
 import InsightsIcon from "@mui/icons-material/Insights";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
@@ -22,9 +23,18 @@ const actions = [
   {
     title: "Manage References",
     description: "Manage company check-in locations and access references.",
-    tag: "Admin",
+    tag: "Admin/Deployer",
     to: "/dashboard/manage-references",
-    icon: <ManageAccounts />,
+    icon: <ContentPasteSearchIcon />,
+    accessLevels: [3, 4],
+    active: true,
+  },
+  {
+    title: "Manage Accounts",
+    description: "Manage user accounts.",
+    tag: "Admin",
+    to: "/dashboard/manage-accounts",
+    icon: <ManageAccountsIcon />,
     accessLevels: [3],
     active: true,
   },
@@ -32,8 +42,8 @@ const actions = [
     title: "Generate QR",
     description:
       "Create and download official check-in QR codes for companies.",
-    tag: "Admin",
-    accessLevels: [3],
+    tag: "Admin/Deployer",
+    accessLevels: [3, 4],
     icon: <QrCode2Icon />,
     to: "/dashboard/generate-qr",
   },
@@ -41,7 +51,7 @@ const actions = [
     title: "Attendance",
     description: "Monitor live attendance records, metrics, and Excel exports.",
     tag: "All roles",
-    accessLevels: [1, 2, 3],
+    accessLevels: [1, 2, 3, 4],
     icon: <InsightsIcon />,
     to: "/dashboard/attendance",
   },

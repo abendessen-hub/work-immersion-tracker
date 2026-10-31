@@ -416,6 +416,14 @@ function AppContent() {
           }
         />
         <Route
+          path="/dashboard/manage-accounts"
+          element={
+            <ProtectedRoute>
+              <ManageReferences />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/dashboard/generate-qr"
           element={
             <ProtectedRoute>

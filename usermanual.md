@@ -166,8 +166,43 @@ Fill out each column in `student-account-template.xlsx` without renaming or reor
 4. Click **Create Accounts & Download XLSX**.
 5. Your browser will automatically download `student-accounts.xlsx`, which contains each student's generated **Username** and **Temporary Password**. Distribute these credentials privately to each student.
 
-### 5.5 Generate QR (Partner Company Setup)
-**Access:** Admins Only (Level 3)  
+### 5.5 Manage References (Partner Company Setup)
+**Access:** Admins/Deployers Only (Level 3/4)  
+**Purpose:** To manage references such as company, section, and access reference (Admin level)
+
+1. Open **Manage Refernces** from the Dashboard.
+#### Company references
+Each company needs a location and check-in radius before students can record attendance there.
+##### Updating References
+1. (Optional) by selecting a pressing a company u can start editing it's values.
+2. Put a name for the company.
+3. Put an allowed radius (in meters) for the company.
+4. Press "Use Current Location" to insert location data/
+5. Press "Create Company" (or "Save Company" in edit mode) to save changes.
+##### Deleting references
+1. Select company from which u wanna delete.
+2. Press "Delete".
+#### Section references
+##### Updating References
+1. Select company from dropdown.
+2. (Optional) by selecting a pressing a section u can start editing it's values.
+3. Put a name for the section.
+5. Press "Create Section" (or "Save Section" in edit mode) to save changes.
+##### Deleting references
+1. Select company from which u wanna delete.
+2. Press "Delete".
+#### Access references (Admin Level)
+Built-in roles with IDs 1–3 are reserved by the app. Additional access references do not receive permissions automatically.
+##### Updating References
+2. (Optional) by selecting a pressing a access reference u can start editing it's values.
+3. Put a name for the access reference.
+5. Press "Create Access Reference" (or "Save Access Reference" in edit mode) to save changes.
+##### Deleting references
+1. Select company from which u wanna delete.
+2. Press "Delete".
+
+### 5.6 Generate QR (Partner Company Setup)
+**Access:** Admins/Deployers Only (Level 3/4)  
 **Purpose:** Produces official, verifiable check-in QR code images for partner immersion sites.
 
 1. Open **Generate QR** from the Dashboard.
@@ -176,8 +211,8 @@ Fill out each column in `student-account-template.xlsx` without renaming or reor
 4. Click **Download PNG** to save the high-resolution image (named `company-name-check-in-qr.png`).
 5. Print or forward the PNG to the partner company supervisor to post at the workplace check-in area.
 
-### 5.6 Create Teacher Accounts
-**Access:** Admins Only (Level 3)  
+### 5.7 Create Teacher Accounts
+**Access:** Admins/Deployers Only (Level 3/4)  
 **Purpose:** Registers new Work Immersion Teachers (Access Level 2) in WIMS.
 
 1. Open **Create Teacher Accounts** from the Dashboard.
