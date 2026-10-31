@@ -13,8 +13,9 @@
    - [5.2 Scan QR (Student Attendance Logging)](#52-scan-qr-student-attendance-logging)
    - [5.3 Attendance Monitoring & Excel Reports](#53-attendance-monitoring--excel-reports)
    - [5.4 Create Student Accounts (Bulk Excel Import)](#54-create-student-accounts-bulk-excel-import)
-   - [5.5 Generate QR (Partner Company Setup)](#55-generate-qr-partner-company-setup)
-   - [5.6 Create Teacher Accounts](#56-create-teacher-accounts)
+   - [5.5 Manage References](#55-manage-references)
+   - [5.6 Generate QR (Partner Company Setup)](#56-generate-qr-partner-company-setup)
+   - [5.7 Create Teacher Accounts](#57-create-teacher-accounts)
 6. [Troubleshooting & System Messages](#6-troubleshooting--system-messages)
 
 ---
@@ -166,62 +167,75 @@ Fill out each column in `student-account-template.xlsx` without renaming or reor
 4. Click **Create Accounts & Download XLSX**.
 5. Your browser will automatically download `student-accounts.xlsx`, which contains each student's generated **Username** and **Temporary Password**. Distribute these credentials privately to each student.
 
-### 5.5 Manage References (Partner Company Setup)
-**Access:** Admins/Deployers Only (Level 3/4)  
-**Purpose:** To manage references such as company, section, and access reference (Admin level)
+### 5.5 Manage References
+**Access:** Admins only (Level 3); deployer access can also be enabled in the backend if configured.  
+**Purpose:** Maintains the master records used by the rest of the system, including partner companies, class sections, and access reference names.
 
-1. Open **Manage Refernces** from the Dashboard.
+1. Open **Manage References** from the Dashboard.
+2. Use the tabs or sections for **Company**, **Section**, and **Access Reference**.
+
 #### Company references
-Each company needs a location and check-in radius before students can record attendance there.
-##### Updating References
-1. (Optional) by selecting a pressing a company u can start editing it's values.
-2. Put a name for the company.
-3. Put an allowed radius (in meters) for the company.
-4. Press "Use Current Location" to insert location data/
-5. Press "Create Company" (or "Save Company" in edit mode) to save changes.
-##### Deleting references
-1. Select company from which u wanna delete.
-2. Press "Delete".
+Each company record can include its name, geographic coordinates, and allowed check-in radius.
+
+##### Creating or updating a company
+1. Click **Create Company** to add a new entry, or select an existing company and click **Edit** to update it.
+2. Enter the company name.
+3. Enter the allowed radius in meters.
+4. To auto-fill coordinates, click **Use Current Location**.
+5. Save the entry by clicking **Create Company** or **Save Company**.
+
+##### Deleting a company
+1. Select the company from the list.
+2. Click **Delete**.
+3. Confirm the deletion when prompted.
+
 #### Section references
-##### Updating References
-1. Select company from dropdown.
-2. (Optional) by selecting a pressing a section u can start editing it's values.
-3. Put a name for the section.
-5. Press "Create Section" (or "Save Section" in edit mode) to save changes.
-##### Deleting references
-1. Select company from which u wanna delete.
-2. Press "Delete".
-#### Access references (Admin Level)
-Built-in roles with IDs 1–3 are reserved by the app. Additional access references do not receive permissions automatically.
-##### Updating References
-2. (Optional) by selecting a pressing a access reference u can start editing it's values.
-3. Put a name for the access reference.
-5. Press "Create Access Reference" (or "Save Access Reference" in edit mode) to save changes.
-##### Deleting references
-1. Select company from which u wanna delete.
-2. Press "Delete".
+A section is tied to a specific company and can be assigned to a teacher or class.
+
+##### Creating or updating a section
+1. Select the company from the dropdown list.
+2. Enter the section name.
+3. Click **Create Section** or **Save Section** to keep the record.
+
+##### Deleting a section
+1. Select the section from the list.
+2. Click **Delete**.
+
+#### Access references
+Access reference values are system-level labels used to identify roles. Built-in IDs 1–3 are reserved for the app's standard roles.
+
+##### Creating or updating an access reference
+1. Select the access reference to edit, or start with a new entry.
+2. Enter the access name.
+3. Click **Create Access Reference** or **Save Access Reference**.
+
+##### Deleting an access reference
+1. Select the access reference from the list.
+2. Click **Delete**.
 
 ### 5.6 Generate QR (Partner Company Setup)
-**Access:** Admins/Deployers Only (Level 3/4)  
+**Access:** Admins only (Level 3)  
 **Purpose:** Produces official, verifiable check-in QR code images for partner immersion sites.
 
 1. Open **Generate QR** from the Dashboard.
 2. Open the **Company** dropdown menu and choose the target partner company.
 3. Click **Generate QR Code**. The unique QR graphic will render in the preview pane.
-4. Click **Download PNG** to save the high-resolution image (named `company-name-check-in-qr.png`).
-5. Print or forward the PNG to the partner company supervisor to post at the workplace check-in area.
+4. Click **Download PNG** to save the image file.
+5. Print or distribute the downloaded file to the partner company supervisor to post at the check-in area.
 
 ### 5.7 Create Teacher Accounts
-**Access:** Admins/Deployers Only (Level 3/4)  
+**Access:** Admins only (Level 3)  
 **Purpose:** Registers new Work Immersion Teachers (Access Level 2) in WIMS.
 
 1. Open **Create Teacher Accounts** from the Dashboard.
 2. Complete all required form fields:
    * **Full name:** Teacher's complete name (e.g., `Juan Dela Cruz`).
    * **Username:** Unique login identifier (lowercase recommended, no spaces).
+   * **Section:** Section assignment associated with the teacher.
+   * **Company:** Assigned partner company.
    * **Password:** Initial login password (minimum **6 characters**).
    * **Contact number:** Active mobile number (e.g., `09XX XXX XXXX`).
-3. Click **Create Account**. Wait for the green confirmation banner verifying that the teacher account is active.
+3. Click **Create Account**. A confirmation message appears when the teacher account is successfully created.
 
 ---
 
