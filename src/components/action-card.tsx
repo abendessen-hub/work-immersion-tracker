@@ -5,6 +5,7 @@ type ActionCardProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   title: string;
   description: string;
   tag?: ReactNode;
+  icon?: ReactNode;
   active?: boolean;
   accessLevels?: number[];
 };
@@ -13,6 +14,7 @@ function ActionCard({
   title,
   description,
   tag,
+  icon,
   accessLevels = [1],
   active = false,
   className = "",
@@ -27,6 +29,16 @@ function ActionCard({
   }
   return (
     <button className={classes} type="button" {...buttonProps}>
+      <div className="action-top">
+        {icon ? (
+          <span className="action-icon" aria-hidden="true">
+            {icon}
+          </span>
+        ) : null}
+        <span className="action-arrow" aria-hidden="true">
+          →
+        </span>
+      </div>
       <h3 className="action-title">{title}</h3>
       <p className="action-desc">{description}</p>
       {tag ? <span className="action-tag">{tag}</span> : null}
