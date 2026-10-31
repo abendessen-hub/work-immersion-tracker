@@ -73,7 +73,7 @@ function isForeignKeyViolation(error: unknown): boolean {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const session = getSession(req);
   if (!session) return res.status(401).json({ error: "Please sign in first" });
-  if (!(session.accessId in allowedAccess)) {
+  if (!Object.values(allowedAccess).includes(session.accessId)) {
     return res.status(403).json({ error: "Admin/Deployer access is required" });
   }
 
