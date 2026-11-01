@@ -1,7 +1,10 @@
 # Work Immersion Monitoring System (WIMS) — Official User Manual
 
 **Partner Institutions:** Luis Y. Ferrer Jr. Senior High School • JDVP • Nexus • XDO  
-**System Timezone:** Philippine Standard Time (`Asia/Manila`)
+**System Timezone:** Philippine Standard Time (`Asia/Manila`)  
+**Platform Architecture:** React (Vite) + TypeScript • Modern Clean & Minimalist Interface
+
+---
 
 ### Table of Contents
 1. [System Overview & Core Objectives](#1-system-overview--core-objectives)
@@ -9,263 +12,245 @@
 3. [Quick-Start Workflows by Role](#3-quick-start-workflows-by-role)
 4. [Authentication & Account Security](#4-authentication--account-security)
 5. [Step-by-Step Module Guides](#5-step-by-step-module-guides)
-   - [5.1 Dashboard Navigation](#51-dashboard-navigation)
+   - [5.1 Dashboard Navigation & Interface Overview](#51-dashboard-navigation--interface-overview)
    - [5.2 Scan QR (Student Attendance Logging)](#52-scan-qr-student-attendance-logging)
    - [5.3 Attendance Monitoring & Excel Reports](#53-attendance-monitoring--excel-reports)
    - [5.4 Create Student Accounts (Bulk Excel Import)](#54-create-student-accounts-bulk-excel-import)
-   - [5.5 Manage References](#55-manage-references)
+   - [5.5 Manage References (Geofencing & System Data)](#55-manage-references-geofencing--system-data)
    - [5.6 Generate QR (Partner Company Setup)](#56-generate-qr-partner-company-setup)
-   - [5.7 Create Account](#57-create-account)
-   - [5.8 Manage Accounts](#58-manage-accounts)
-6. [Troubleshooting & System Messages](#6-troubleshooting--system-messages)
+   - [5.7 Create Account (General User Provisioning)](#57-create-account-general-user-provisioning)
+   - [5.8 Manage Accounts (User Administration & Directory)](#58-manage-accounts-user-administration--directory)
+6. [Design Standards & UI Features](#6-design-standards--ui-features)
+7. [Troubleshooting & System Messages](#7-troubleshooting--system-messages)
 
 ---
 
 ## 1. System Overview & Core Objectives
 
-The **Work Immersion Monitoring System (WIMS)** is a centralized web platform built to manage, verify, and report Senior High School student attendance across partner immersion companies. By replacing manual paper logbooks with company-specific QR verification and automated spreadsheet workflows, WIMS ensures accurate real-time tracking from deployment through completion.
+The **Work Immersion Monitoring System (WIMS)** is a centralized web platform designed for Senior High School Work Immersion programs (specifically partnered with **Luis Y. Ferrer Jr. Senior High School**). WIMS streamlines the logging, monitoring, and validation of trainee attendance across partner deployment sites.
 
-* **Verifiable Attendance Tracking:** Records daily **Time In** and **Time Out** using company-specific QR codes synchronized to Philippine Standard Time (`Asia/Manila`).
-* **Role-Based Data Privacy:** Restricts students to viewing only their personal attendance logs while equipping teachers and administrators with multi-filter analytics and Excel (`.xlsx`) exports.
-* **Automated Bulk Onboarding:** Enables teachers and administrators to provision up to 500 student accounts simultaneously via standardized Excel templates.
-* **Enforced Account Security:** Requires all newly created student accounts to replace their temporary passwords upon initial sign-in.
+By substituting manual paper logbooks with secure, location-verified QR scanning, automated spreadsheet management, and paginated data tables, WIMS guarantees high operational efficiency and data fidelity from student deployment to program completion.
+
+* **Verifiable Attendance Tracking:** Records daily **Time In** and **Time Out** with company-specific QR validation calibrated to Philippine Standard Time (`Asia/Manila`).
+* **Geofencing & GPS Radius Verification:** Enforces check-in boundaries (in meters) around partner company coordinates (`latitude` and `longitude`), ensuring students log attendance while physically on-site.
+* **Role-Based Data Privacy:** Students access solely their personal attendance history. Immersion teachers, deployers, and administrators are equipped with live statistics, multi-parameter filters (Date, Section, Company), and one-click Excel (`.xlsx`) report exports.
+* **Streamlined Bulk Onboarding:** Enables rapid provisioning of up to 500 student accounts in a single batch using standardized Excel templates.
+* **Enforced Account Security:** Mandates password updates upon initial sign-in for newly generated accounts.
 
 ---
 
 ## 2. User Roles & Access Matrix
 
-WIMS assigns system capabilities based on four access levels. A checkmark (`Yes`) indicates the module is available to the user's role.
+WIMS implements role-based access control (RBAC) across four standard access levels:
 
 | System Capability / Module | Student (Level 1) | Teacher (Level 2) | Admin (Level 3) | Deployer (Level 4) |
 | :--- | :---: | :---: | :---: | :---: |
 | **Sign In & Session Management** | Yes | Yes | Yes | Yes |
 | **Mandatory First-Time Password Reset** | Yes | No | No | No |
-| **Scan QR** (Log Daily Time In / Time Out) | Yes | No | No | No |
-| **Attendance** (Personal History & Export) | Yes | No | No | No |
-| **Attendance** (All Students, Filters & Export) | No | Yes | Yes | Yes |
+| **Scan QR** (Log Daily Time In / Time Out) | Yes | Yes | Yes | No |
+| **Attendance** (Personal History & Personal Export) | Yes | No | No | No |
+| **Attendance** (Class / School-wide Filters & Excel Export) | No | Yes | Yes | Yes |
 | **Create Student Accounts** (Bulk `.xlsx` Import) | No | Yes | Yes | No |
 | **Manage References — Companies & Sections** | No | No | Yes | Yes |
 | **Manage References — Access References** | No | No | Yes | No |
-| **Generate QR** (Partner Company PNGs) | No | No | Yes | Yes |
-| **Create Account** | No | No | Yes | No |
-| **Manage Accounts** | No | No | Yes | No |
+| **Generate QR** (Partner Company Check-in PNGs) | No | No | Yes | Yes |
+| **Create Account** (Single Account Creation) | No | No | Yes | No |
+| **Manage Accounts** (User Administration & Directory) | No | No | Yes | No |
 
 ---
 
 ## 3. Quick-Start Workflows by Role
 
-**For Administrators (Initial System Setup)**
-1. **Generate Company QR Codes:** Open **Generate QR**, select each partner company, download the PNG files, and send them to the respective deployment sites for display.
-2. **Onboard Staff:** Open **Create Account**, enter account details, and select the correct access reference.
-3. **Provision or Monitor Students:** Assist teachers with bulk student imports or monitor school-wide attendance via the **Attendance** module.
+### For Administrators (Level 3) & Deployers (Level 4)
+1. **Configure Reference Locations:** Navigate to **Manage References** to establish partner companies, check-in radius (e.g., 20 meters), and geographic coordinates (latitude and longitude). Use the built-in search and pagination to browse active companies and sections.
+2. **Generate Company QR Codes:** In **Generate QR**, generate and download high-resolution PNG QR codes for each partner company and deliver them to designated immersion sites.
+3. **Provision Supervising Staff & Accounts:** In **Create Account**, register accounts for teachers, deployers, or administrators.
+4. **Oversee System Accounts:** Use **Manage Accounts** to review user statuses, filter across paginated records, update profile assignments, or reset passwords.
+5. **Monitor School-wide Immersion:** Access **Attendance** to audit real-time immersion progress across all sections and companies.
 
-**For Immersion Teachers (Class Setup & Daily Monitoring)**
-1. **Bulk-Create Student Accounts:** Open **Create Student Accounts**, download the Excel template, populate your class list (matching exact Section and Company names), upload the file, and distribute the downloaded credential sheet to your students.
-2. **Track Daily Deployment:** Open **Attendance**, filter by **Date**, **Section**, and **Company** to check who is `Attended`, `No Time Out`, or `Absent`, and click **Download Attendance Report.xlsx** for official grading records.
+### For Immersion Teachers (Level 2)
+1. **Prepare Class Lists:** Open **Create Student Accounts**, download the standardized Excel template (`student-account-template.xlsx`), and input student information. Verify that Section and Company names precisely match active system references.
+2. **Bulk Provision Students:** Upload the filled workbook. Download the generated `student-accounts.xlsx` file and securely distribute usernames and temporary passwords to your students.
+3. **Daily Attendance Supervision:** Open **Attendance**, filter by **Date**, **Section**, and **Company**, and inspect attendance statuses (`Attended`, `No Time Out`, or `Absent`).
+4. **Export Grading Sheets:** Click **Download Attendance Report.xlsx** to produce official reports for academic grading and DepEd compliance records.
 
-**For Students (First Login & Daily Immersion Routine)**
-1. **Activate Your Account:** Sign in using your assigned username and temporary password, then complete the mandatory password reset prompt.
-2. **Log Daily Attendance:** Upon arriving at your partner company, open **Scan QR** and scan the company's official WIMS QR code to log your **Time In**. Scan the exact same QR code at the end of your shift to log your **Time Out**.
-3. **Review Your Hours:** Open **Attendance** anytime to verify your logged timestamps or download your personal `.xlsx` record.
+### For Students / Trainees (Level 1)
+1. **First-Time Sign In:** Log in using your assigned username (`[last 4 LRN digits][lastname]`) and temporary password.
+2. **Mandatory Password Reset:** Immediately enter and confirm a personal password with at least 6 characters.
+3. **Morning Time In:** Upon arriving at your partner immersion company, open **Scan QR**, tap **Start Camera**, and scan the company's official WIMS QR poster.
+4. **Afternoon Time Out:** At the conclusion of your shift, scan the same QR code to record your departure timestamp.
+5. **Verify Your Hours:** Check the **Attendance** module anytime to track your total logged immersion hours and view your attendance records.
 
 ---
 
 ## 4. Authentication & Account Security
 
 ### 4.1 Signing In to WIMS
-1. Open the **WIMS Portal** in your mobile or desktop web browser.
-2. Enter your assigned **Username**:
-   * **Student Format:** Last 4 digits of your LRN + lowercase last name with spaces removed.
-   * **Example:** If LRN is `109876541234` and Last Name is `Dela Cruz`, the username is `1234delacruz`.
-3. Enter your **Password**. Click the **eye icon** inside the field if you need to verify what you typed.
+1. Open the **WIMS Portal** on any modern desktop or mobile browser.
+2. Provide your assigned **Username**:
+   * **Student Format:** The last 4 digits of your LRN concatenated with your lowercase legal last name without spaces (e.g., LRN `109876543210` + surname `Dela Cruz` = `3210delacruz`).
+   * **Staff Format:** Standard personalized handle (e.g., `henrich_123` or `0401admin`).
+3. Enter your **Password**. Click the toggle icon to display the typed characters if needed.
 4. Click **Sign In**.
 
-### 4.2 Mandatory First-Time Password Change (Students Only)
-To protect student privacy, accounts generated via bulk import use temporary passwords that must be changed before accessing the system:
-
-1. Immediately after your first sign-in attempt, the **Change Password** modal will appear on screen.
-2. Verify the **Current Password** field (automatically pre-filled from your sign-in).
-3. Enter a **New Password** containing **at least 6 characters**.
-4. Re-type the exact password in the **Confirm New Password** field.
-5. Click **Change Password**. Your credentials will update immediately, and you will be redirected to your **Dashboard**.
+### 4.2 Mandatory First-Time Password Reset (Students & Reset Accounts)
+To safeguard student privacy and account integrity:
+1. Upon the first successful authentication with a temporary or reset password, the **Change Password** security dialog opens automatically.
+2. Enter your **New Password** (minimum 6 characters).
+3. Re-enter the exact password in **Confirm New Password**.
+4. Click **Change Password** to commit. The system updates your credentials immediately and opens your **Dashboard**.
 
 ---
 
 ## 5. Step-by-Step Module Guides
 
-### 5.1 Dashboard Navigation
-Once authenticated, the **Dashboard** displays interactive action cards corresponding to your role's permissions.
-* **Open a Module:** Click any **Action Card** on the main screen.
-* **Return to Dashboard:** Click the **Back** button located at the top-right corner of any module page.
-* **End Your Session:** Click **Log Out** at the top-right corner of the Dashboard (always log out when using shared school computers).
+### 5.1 Dashboard Navigation & Interface Overview
+The WIMS dashboard adopts a clean, professional, and minimalist aesthetic:
+* **Header Indicators:** Displays the system title, user greeting, and an identity badge indicating your active portal role (**Student Portal**, **Teacher Portal**, **Admin Portal**, or **Deployer Portal**).
+* **Action Cards:** Interactive tiles displaying an intuitive icon, module title, operational description, role badge, and navigation arrow.
+* **Return Navigation:** Every sub-module includes a clean ghost **Back** button at the upper right to quickly return to the dashboard.
+* **Session Termination:** Click the **Log Out** button at any time to invalidate your active session.
 
 ### 5.2 Scan QR (Student Attendance Logging)
-**Access:** Students (Level 1)  
-**Purpose:** Records verifiable daily arrival (**Time In**) and departure (**Time Out**) at the assigned partner company.
+* **Access Level:** Students (Level 1), Teachers (Level 2), Admins (Level 3)
+* **Objective:** Records physical arrival (**Time In**) and departure (**Time Out**) at the immersion establishment.
 
-**How to Log Attendance:**
-1. From the Dashboard, click **Scan QR**.
-2. Click **Start Camera** and click **Allow** when your browser asks for camera permissions.
-3. Aim your device's camera squarely at your company's official WIMS QR code.
-4. Wait for the automatic scan to complete. The camera will turn off automatically and display a status banner:
-   * **1st Scan of the Day:** Displays `Time in recorded successfully.` and logs your arrival timestamp.
-   * **2nd Scan of the Day:** Displays `Time out recorded successfully.` and logs your departure timestamp.
+**Operational Steps:**
+1. From the dashboard, select **Scan QR**.
+2. Tap **Start Camera** and grant your web browser camera permissions if prompted.
+3. Point your camera at the official WIMS QR code displayed at your immersion workplace.
+4. Upon recognition, the scanner provides immediate visual feedback:
+   * **First Scan of the Day:** Records **Time In** timestamp and confirms with a clear success message.
+   * **Second Scan of the Day:** Records **Time Out** timestamp and confirms shift completion.
 
-**Attendance Validation Rules:**
-* **Company Lock:** Your account is bound to one designated partner company. Scanning another company's QR code will fail and trigger an error.
-* **Two-Scan Daily Limit:** Each student is permitted exactly one **Time In** and one **Time Out** per calendar day (`Asia/Manila`). Any subsequent scan attempts on the same day are automatically blocked.
+**Validation Protocols:**
+* **Company Locking:** Each student is registered to a specific immersion company. Scanning a QR code belonging to a different company is blocked with a validation alert.
+* **Two-Scan Daily Limit:** Each student is restricted to one arrival and one departure timestamp per calendar day (`Asia/Manila`).
+* **Geofence Proximity:** If GPS verification is active for the company, the device's location must fall within the configured perimeter radius.
 
 ### 5.3 Attendance Monitoring & Excel Reports
-**Access:** All Roles (View and controls adapt to user level)  
-**Purpose:** Provides live attendance counters, status tracking, and downloadable Excel (`.xlsx`) reports.
+* **Access Level:** All Roles (Interface adapts automatically to role permissions)
+* **Objective:** Live attendance metrics, record verification, and spreadsheet export.
 
-#### A. Student View
-1. Select **Attendance** from the Dashboard.
-2. Review the top summary counters:
-   * **Your records:** Total immersion days logged.
-   * **Time in recorded:** Total days with a verified arrival scan.
-   * **Time out recorded:** Total days with a verified departure scan.
-3. *(Optional)* Select a date in the **Date** picker to filter records on or after that date.
-4. Search the matching records and use page controls to browse 20 items at a time.
-5. Click **Download Attendance Report.xlsx** to save a personal spreadsheet copy of the matching attendance logs.
+#### Student View
+* Summarizes personal attendance counters: **Your records**, **Time in recorded**, and **Time out recorded**.
+* Displays an interactive list of all immersion dates with verified check-in and check-out timestamps.
+* Allows personal spreadsheet export for portfolio documentation.
 
-#### B. Teacher & Admin View
-1. Select **Attendance** from the Dashboard.
-2. Review the school-wide summary metrics across the top cards (**Student records**, **Students**, **Time in recorded**, **Time out recorded**).
-3. Locate the **Report filters** panel and select values for all three criteria:
-   * **Date:** Displays attendance records starting on or after the chosen date.
-   * **Section:** Filters students belonging to a specific class section.
-   * **Company:** Filters students deployed to a specific partner company.
-4. Search the matching records and use page controls to browse 20 items at a time.
-5. Once **Date**, **Section**, and **Company** are all selected (and matching records exist), the **Download Attendance Report.xlsx** button becomes active. Click it to export the matching attendance records.
+#### Teacher, Admin, & Deployer View
+* Displays aggregate metrics: **Student records**, total **Students**, **Time in recorded**, and **Time out recorded**.
+* **Filter Panel Controls:**
+  * **Date:** Filter records starting on or matching the selected date.
+  * **Section:** Filter by class section (Teachers are pre-filtered to their assigned section).
+  * **Company:** Filter by immersion partner company.
+* **Paginated Records:** Browse large attendance lists with search input and pagination buttons (showing 20 records per page).
+* **Exporting to Excel:** When the required filter parameters (**Date**, **Section**, and **Company**) are selected, click **Download Attendance Report.xlsx** to generate the styled spreadsheet.
 
-**Understanding Exported Attendance Statuses:**
-* `Attended`: The student successfully logged both **Time In** and **Time Out** for the day.
-* `No Time Out`: The student logged **Time In**, but did not scan out before the report was generated.
-* `Absent`: The student has neither a **Time In** nor a **Time Out** record for the specified date.
+**Status Code Definitions:**
+* `Attended`: Trainee logged both an arrival scan and a departure scan for the day.
+* `No Time Out`: Trainee recorded arrival, but had not recorded departure at report generation time.
+* `Absent`: Trainee has no attendance log for the target date.
 
 ### 5.4 Create Student Accounts (Bulk Excel Import)
-**Access:** Teachers (Level 2) & Admins (Level 3)  
-**Purpose:** Automates the creation of up to 500 student accounts at once using a structured `.xlsx` template.
+* **Access Level:** Teachers (Level 2) and Admins (Level 3)
+* **Objective:** Rapidly provision student accounts in batches of 1 to 500 records.
 
-**Step 1: Check Reference Names & Download the Template**
-1. Open **Create Student Accounts** from the Dashboard.
-2. Review the on-screen **Company** and **Section** reference tables. Search as needed; tables show up to 20 items per page. Every student row in your spreadsheet must match these exact system names (case-insensitive).
-3. Click **Download Template** to save `student-account-template.xlsx` to your computer.
+**Execution Guide:**
+1. Open **Create Student Accounts**.
+2. Examine the **Company** and **Section** reference tables displayed on-screen. Each table features search and pagination (20 items per page) to easily verify active reference names.
+3. Click **Download Template** to obtain `student-account-template.xlsx`.
+4. Populate the workbook columns:
+   * `LRN` (Text format, minimum 4 digits)
+   * `Last Name` (Required)
+   * `First Name` (Required)
+   * `Middle Name` (Optional, leave blank if none)
+   * `Section` (Must match active system Section)
+   * `Company` (Must match active system Company)
+   * `ContactNumber` (Text format, e.g. `09171234567`)
+5. Click **Choose Spreadsheet**, select your filled `.xlsx` file, and verify the record count.
+6. Click **Create Accounts & Download XLSX**.
+7. The browser automatically downloads `student-accounts.xlsx` containing the newly minted credentials (usernames and temporary passwords) ready for distribution.
 
-**Step 2: Populate the Spreadsheet**
-Fill out each column in `student-account-template.xlsx` without renaming or reordering the header row:
+### 5.5 Manage References (Geofencing & System Data)
+* **Access Level:** Admins (Level 3) can manage companies, sections, and access references. Deployers (Level 4) can manage companies and sections.
+* **Objective:** Configure partner companies, geofences, sections, and access reference definitions.
 
-| Column Header | Requirement | Formatting & Validation Rules |
-| :--- | :---: | :--- |
-| `LRN` | Required | Minimum 4 digits. Format column as Text in Excel so leading zeros are preserved. |
-| `Last Name` | Required | Student's legal surname (used to generate the default username). |
-| `First Name` | Required | Student's given name. |
-| `Middle Name` | Optional | Leave blank if not applicable. |
-| `Section` | Required | Must match an existing entry in the on-screen **Section** reference list. |
-| `Company` | Required | Must match an existing entry in the on-screen **Company** reference list. |
-| `ContactNumber` | Required | Student's mobile number (e.g., `09171234567`). Format column as Text to preserve the leading `0`. |
+#### Company References
+* **Company Name:** Legal/official trade name of the immersion partner.
+* **Allowed Radius (meters):** Maximum distance allowed for mobile check-in (e.g., `20` meters).
+* **Latitude & Longitude:** Exact GPS coordinates. Click **Use Current Location** to automatically capture device coordinates with high accuracy.
+* **Search & List:** Paginated reference cards (20 per page) with search bar, displaying coordinates, radius, and **Edit** and **Delete** actions.
 
-**Step 3: Upload & Distribute Credentials**
-1. Return to the **Create Student Accounts** page and click **Choose Spreadsheet**.
-2. Select your saved `.xlsx` file (must contain between **1 and 500** student rows).
-3. Confirm that the validation banner reads: `X student row(s) ready to import.`
-4. Click **Create Accounts & Download XLSX**.
-5. Your browser will automatically download `student-accounts.xlsx`, which contains each student's generated **Username** and **Temporary Password**. Distribute these credentials privately to each student.
+#### Section References
+* Defines class sections. Sections exist independently so students can be mapped to any company regardless of section.
+* Create, search, paginate, edit, and delete section records with instant synchronization across student account creation templates.
 
-### 5.5 Manage References
-**Access:** Admins (Level 3) can manage companies, sections, and access references. Deployers (Level 4) can manage companies and sections only; access references are restricted to admins.
-
-**Purpose:** Maintains partner company and class section records used by the rest of the system. Admins can also manage access reference names.
-
-1. Open **Manage References** from the Dashboard.
-2. Admins can use **Company**, **Section**, and **Access Reference**. Deployers can use **Company** and **Section** only.
-3. Use each section's search field and page controls to browse matching records; each page shows up to 20 items. Access references remain a separate admin-only list.
-
-#### Company references
-Each company record can include its name, geographic coordinates, and allowed check-in radius.
-
-##### Creating or updating a company
-1. Click **Create Company** to add a new entry, or select an existing company and click **Edit** to update it.
-2. Enter the company name.
-3. Enter the allowed radius in meters.
-4. To auto-fill coordinates, click **Use Current Location**.
-5. Save the entry by clicking **Create Company** or **Save Company**.
-
-##### Deleting a company
-1. Select the company from the list.
-2. Click **Delete**.
-3. Confirm the deletion when prompted.
-
-#### Section references
-A section is an independent reference. Company assignment is set on each user account and is not inherited from the section.
-
-##### Creating or updating a section
-1. Enter the section name.
-2. Click **Create Section** or **Save Section** to keep the record.
-
-##### Deleting a section
-1. Select the section from the list.
-2. Click **Delete**.
-
-#### Access references
-Access reference values are system-level labels used to identify roles. Built-in IDs 1–3 are reserved for the app's standard roles.
-
-##### Creating or updating an access reference
-1. Select the access reference to edit, or start with a new entry.
-2. Enter the access name.
-3. Click **Create Access Reference** or **Save Access Reference**.
-
-##### Deleting an access reference
-1. Select the access reference from the list.
-2. Click **Delete**.
+#### Access References (Admin Only)
+* Displays built-in platform access roles (IDs 1–3 reserved for standard Student, Teacher, Admin, and ID 4 for Deployer).
+* Allows creation of custom system role labels when expanding integration scopes.
 
 ### 5.6 Generate QR (Partner Company Setup)
-**Access:** Admins (Level 3) and Deployers (Level 4)
-**Purpose:** Produces official, verifiable check-in QR code images for partner immersion sites.
+* **Access Level:** Admins (Level 3) and Deployers (Level 4)
+* **Objective:** Produce crisp, printable QR code markers for each deployment location.
+1. Select **Generate QR** from the dashboard.
+2. Choose the partner company from the dropdown menu.
+3. Click **Generate QR Code** to view the preview.
+4. Click **Download PNG** to save the graphic.
+5. Print or frame the QR code image for display at the partner company's reception or check-in desk.
 
-1. Open **Generate QR** from the Dashboard.
-2. Open the **Company** dropdown menu and choose the target partner company.
-3. Click **Generate QR Code**. The unique QR graphic will render in the preview pane.
-4. Click **Download PNG** to save the image file.
-5. Print or distribute the downloaded file to the partner company supervisor to post at the check-in area.
-
-### 5.7 Create Account
-**Access:** Admins only (Level 3)
-**Purpose:** Creates an account with the selected access reference.
-
-1. Open **Create Account** from the Dashboard.
+### 5.7 Create Account (General User Provisioning)
+* **Access Level:** Admins (Level 3)
+* **Objective:** Create individual user accounts for students, teachers, deployers, or administrators.
+1. Select **Create Account** from the dashboard.
 2. Complete all required form fields:
-   * **Full name:** Account holder's complete name (e.g., `Juan Dela Cruz`).
+   * **Full name:** Complete legal name (e.g., `Juan Dela Cruz`).
    * **Username:** Unique login identifier (lowercase recommended, no spaces).
-   * **Section:** Assigned section.
-   * **Company:** Assigned company. Section and company are selected independently.
-   * **Access reference:** Role to assign to this account.
+   * **Section:** Assigned section (or none).
+   * **Company:** Assigned company (or none). Section and company are configured independently.
+   * **Access reference:** Role to assign to this account (Student, Teacher, Admin, Deployer).
    * **Password:** Initial login password (minimum **6 characters**).
    * **Contact number:** Active mobile number (e.g., `09XX XXX XXXX`).
-3. Click **Create Account**. Account holder must change initial password at first sign-in.
+3. Click **Create Account**. Newly created accounts are prompted to change their password on first sign-in.
 
-### 5.8 Manage Accounts
-**Access:** Admins only (Level 3)
-**Purpose:** Search, update, and remove accounts.
-
-1. Open **Manage Accounts** from the Dashboard.
-2. Search by name, username, access reference, section, company, or contact number. Use page controls to browse 20 accounts at a time.
-3. Click **Edit** to update name, username, access reference, section, company, or contact number. Enter a new password only when resetting it; the user will be asked to change that password at next sign-in.
-4. Click **Delete** and confirm to remove an account. Deleting an account also permanently deletes its attendance records. Admins cannot delete their own active account.
+### 5.8 Manage Accounts (User Administration & Directory)
+* **Access Level:** Admins (Level 3)
+* **Objective:** Search, inspect, edit, and remove registered user accounts.
+* **Account Registry Table:** Displays Name, Username, Access Role, Section, Company, Contact Number, Password Status (`active` or `temporary`), and Action buttons.
+* **Search & Pagination:** Instant search bar filters accounts by name, username, access role, section, company, or contact number, displaying 20 records per page with Previous and Next controls.
+* **Account Editing:** Click **Edit** to modify account details or reset passwords. Entering a new password flags the account to prompt for a password change at next login.
+* **Account Deletion:** Click **Delete** and confirm to permanently remove an account and its associated attendance history. Self-deletion of the active admin account is prevented.
 
 ---
 
-## 6. Troubleshooting & System Messages
+## 6. Design Standards & UI Features
 
-If you encounter an error banner or disabled button while using WIMS, consult the resolution table below:
+WIMS features an interface centered around minimalism, clarity, and professionalism:
 
-| System Message / Issue | Root Cause | Step-by-Step Resolution |
+* **High-Contrast Data Presentation:** Table headers feature a distinct, cool background (`#f5f7fb`) with bold, dark slate text (`#3d5278`) and a crisp separating border, preventing color bleeding into content rows.
+* **Zebra-Striped Rows with Interactive Hover:** Data rows subtly alternate with `#fafbfd` and elevate on hover (`#f0f4fa`) for scanning ease across dense logs.
+* **Pill-Styled Pagination & Toolbar:** Clean, bordered navigation controls (`RecordSearchPagination`) provide search inputs with count indicators and secondary button pills for "Previous" and "Next".
+* **Clean Input Elements:** Form inputs, date pickers, select dropdowns, and search bars render with clean white surfaces, subtle blue-gray borders (`#d0ddf0`), and distinct focus rings.
+* **Clear Button Hierarchy:**
+  * **Primary Buttons:** Bold brand blue (`#1456ce`) with white text and subtle elevation.
+  * **Secondary Buttons:** Crisp white surface with subtle blue border (`#c9ddff`) and blue text.
+  * **Disabled Buttons:** Distinct muted slate gray (`#e9eff8` background, `#8fa0ba` text) to eliminate confusion between active and inactive states.
+* **Responsive Architecture:** Fully responsive grid systems adjust smoothly from wide multi-monitor desktop setups down to mobile smartphone screens used during field monitoring.
+
+---
+
+## 7. Troubleshooting & System Messages
+
+| Notification / Issue | Root Cause | Resolution Steps |
 | :--- | :--- | :--- |
-| `Invalid username or password` | Credentials contain a typo, uppercase letters in the username, or extra spaces. | Check that your username follows the exact lowercase format (`1234lastname`) with no spaces. Click the eye icon to inspect your password before clicking **Sign In**. |
-| `This company QR does not match your assigned company` | The QR code scanned belongs to a different partner company than the one assigned to the student's profile. | Verify that you are scanning the official WIMS QR code designated for your assigned company. If your deployment site changed, ask your teacher or admin to update your company assignment. |
-| `Your attendance is already complete for today` | The student has already completed both the **Time In** (1st scan) and **Time Out** (2nd scan) for the current calendar day. | No further action is required. Check the **Attendance** module to confirm both timestamps are recorded. |
-| `Missing template columns: ...` | One or more column headers in the uploaded `.xlsx` file were deleted, renamed, or misspelled. | Click **Download Template** on the **Create Student Accounts** page to get a fresh copy, and paste your data values directly under the original headers. |
-| `Row X: Section / Company was not found.` | The Section or Company name typed in Row `X` does not match any active record in the WIMS database. | Check the **Company** and **Section** reference tables displayed on the **Create Student Accounts** screen and correct the spelling in Row `X` of your Excel file. |
-| `Download Attendance Report.xlsx` button is disabled | Required report filters are unselected (Teacher/Admin view), or the current filter combination returned zero records. | Select a specific **Date**, **Section**, and **Company** in the **Report filters** panel, and verify that at least one student record appears in the table below. |
-| Camera fails to start on **Scan QR** | Browser camera permissions were denied, or another app is currently using the camera. | Click the lock/site-settings icon in your browser's address bar, set **Camera** to **Allow**, refresh the page, and click **Start Camera** again. |
+| `Invalid username or password` | Typographical error in credentials, uppercase letters in student username, or extra spaces. | Re-verify that the student username follows the lowercase convention (`[last 4 digits LRN][lastname]`). Use the eye toggle to inspect typed characters before submission. |
+| `This company QR does not match your assigned company` | The scanned QR belongs to a different immersion partner than the student's profile assignment. | Verify the physical QR code poster. If the student has changed deployment companies, an administrator must update the student's company assignment. |
+| `Your attendance is already complete for today` | Both Time In and Time Out scans have already been recorded for the current calendar date (`Asia/Manila`). | No further action required. The daily shift is logged and verifiable in the **Attendance** module. |
+| `Missing template columns: ...` | One or more column headers in the uploaded Excel file were modified, reordered, or deleted. | Click **Download Template** on the **Create Student Accounts** screen to fetch a fresh file and copy student data under the pre-existing header titles. |
+| `Row X: Section / Company was not found.` | The company or section name in row `X` does not match active system references. | Check the on-screen reference lists in **Create Student Accounts** or **Manage References** and correct the spelling in the spreadsheet. |
+| `Download Attendance Report.xlsx` button disabled | Required filters (Date, Section, and Company) are incomplete, or the selected filter combination has 0 records. | Ensure a **Date**, **Section**, and **Company** are selected in the filter toolbar and at least one matching record exists in the table. |
+| Camera fails to activate in **Scan QR** | Camera access permission was blocked by the browser, or another software is locking the camera hardware. | Click the site security/permissions icon in the browser address bar, set **Camera** to **Allow**, refresh the page, and click **Start Camera** again. |
+| Location error during company setup | Browser denied geolocation permission or device GPS is toggled off. | Enable device GPS / Location services and allow browser location access when prompted. Coordinates can also be entered manually into the Latitude and Longitude fields. |
+
+---
+
+*Work Immersion Monitoring System (WIMS) — Luis Y. Ferrer Jr. Senior High School*
