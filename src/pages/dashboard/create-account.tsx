@@ -9,6 +9,7 @@ type AccountForm = {
   section: string;
   company: string;
   password: string;
+  changedPassword: string;
   contactNumber: string;
   accessId: string;
 };
@@ -26,6 +27,7 @@ export default function CreateAccountPage() {
     section: "",
     company: "",
     password: "",
+    changedPassword: "",
     contactNumber: "",
     accessId: "",
   };
@@ -45,7 +47,9 @@ export default function CreateAccountPage() {
       .then(async (response) => {
         const result = await response.json();
         if (!response.ok)
-          throw new Error(result.error ?? "Reference data could not be loaded.");
+          throw new Error(
+            result.error ?? "Reference data could not be loaded.",
+          );
         setReferences(result as References);
       })
       .catch((error: unknown) => {
@@ -77,13 +81,12 @@ export default function CreateAccountPage() {
         body: JSON.stringify({
           ...values,
           accessId: Number(values.accessId),
+          changedPassword: values.changedPassword === "true",
         }),
       });
       const result = await response.json();
       if (!response.ok)
-        throw new Error(
-          result.error ?? "Account could not be created.",
-        );
+        throw new Error(result.error ?? "Account could not be created.");
       resetForm();
       setIsError(false);
       setMessage(`Account "${result.user.username}" was created.`);
@@ -188,6 +191,29 @@ export default function CreateAccountPage() {
           value={values.password}
           onChange={handleChange("password")}
         />
+        <label className="form-field" htmlFor="account-changed-password">
+          Changed Password
+          <select
+            id="account-changed-password"
+            value={values.changedPassword}
+            onChange={(event) =>
+              setValues((prev) => ({
+                ...prev,
+                changedPassword: event.target.value,
+              }))
+            }
+            required
+          >
+            <option value="">Select status</option>
+            <option key={"true"} value={"true"}>
+              {"true"}
+            </option>
+
+            <option key={"false"} value={"false"}>
+              {"false"}
+            </option>
+          </select>
+        </label>
         <Form
           label="Contact number"
           id="teacher-contact"

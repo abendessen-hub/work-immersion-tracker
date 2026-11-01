@@ -16,7 +16,11 @@ function positiveId(value: unknown): number | null {
 function nullableId(value: unknown): number | null | undefined {
   if (value === null || value === "") return null;
   const parsed =
-    typeof value === "number" ? value : typeof value === "string" ? Number(value) : NaN;
+    typeof value === "number"
+      ? value
+      : typeof value === "string"
+        ? Number(value)
+        : NaN;
   return isPositiveInteger(parsed) ? parsed : undefined;
 }
 
@@ -102,6 +106,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const contactNumber = cleanText(body.contactNumber);
     const password = typeof body.password === "string" ? body.password : "";
     const accessId = positiveId(body.accessId);
+    const changedPassword =
+      typeof body.changedPassword === "boolean" ? body.changedPassword : null;
 
     if (
       !fullName ||
@@ -110,7 +116,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       !companyName ||
       !contactNumber ||
       !password ||
-      !accessId
+      !accessId ||
+      changedPassword === null
     ) {
       return res.status(400).json({ error: "All fields are required" });
     }
@@ -127,19 +134,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         sql`SELECT access_id FROM access_reference WHERE access_id = ${accessId}`,
       ]);
       if (!section.length) {
-        return res.status(400).json({ error: `Section "${sectionName}" was not found.` });
+        return res
+          .status(400)
+          .json({ error: `Section "${sectionName}" was not found.` });
       }
       if (!company.length) {
-        return res.status(400).json({ error: `Company "${companyName}" was not found.` });
+        return res
+          .status(400)
+          .json({ error: `Company "${companyName}" was not found.` });
       }
       if (!access.length) {
-        return res.status(400).json({ error: "Selected access reference was not found." });
+        return res
+          .status(400)
+          .json({ error: "Selected access reference was not found." });
       }
 
       const existing =
         await sql`SELECT user_id FROM users WHERE lower(username) = ${username} LIMIT 1`;
       if (existing.length) {
-        return res.status(409).json({ error: "That username is already in use" });
+        return res
+          .status(409)
+          .json({ error: "That username is already in use" });
       }
 
       const passwordHash = await bcrypt.hash(password, 10);
@@ -147,7 +162,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         INSERT INTO users
           (username, full_name, password, access_id, section_id, company_id, "changedPassword", contact_number)
         VALUES
-          (${username}, ${fullName}, ${passwordHash}, ${accessId}, ${section[0].section_id}, ${company[0].company_id}, false, ${contactNumber})
+          (${username}, ${fullName}, ${passwordHash}, ${accessId}, ${section[0].section_id}, ${company[0].company_id}, ${changedPassword}, ${contactNumber})
         RETURNING user_id, username, full_name, access_id
       `;
       return res.status(201).json({ user: created[0] });
@@ -165,6 +180,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const accessId = positiveId(body.accessId);
     const sectionId = nullableId(body.sectionId);
     const companyId = nullableId(body.companyId);
+    const changedPassword =
+      typeof body.changedPassword === "boolean" ? body.changedPassword : null;
     const password = typeof body.password === "string" ? body.password : "";
 
     if (
@@ -173,6 +190,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       !username ||
       !contactNumber ||
       !accessId ||
+      changedPassword === null ||
       sectionId === undefined ||
       companyId === undefined
     ) {
@@ -200,16 +218,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           : sql`SELECT company_id FROM company_reference WHERE company_id = ${companyId}`,
       ]);
       if (duplicate.length) {
-        return res.status(409).json({ error: "That username is already in use" });
+        return res
+          .status(409)
+          .json({ error: "That username is already in use" });
       }
       if (!access.length) {
-        return res.status(400).json({ error: "Selected access reference was not found." });
+        return res
+          .status(400)
+          .json({ error: "Selected access reference was not found." });
       }
       if (sectionId !== null && !section.length) {
-        return res.status(400).json({ error: "Selected section was not found." });
+        return res
+          .status(400)
+          .json({ error: "Selected section was not found." });
       }
       if (companyId !== null && !company.length) {
-        return res.status(400).json({ error: "Selected company was not found." });
+        return res
+          .status(400)
+          .json({ error: "Selected company was not found." });
       }
 
       const updated = password
@@ -247,7 +273,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: "Invalid account" });
     }
     if (userId === session.userId) {
-      return res.status(400).json({ error: "You cannot delete your own account" });
+      return res
+        .status(400)
+        .json({ error: "You cannot delete your own account" });
     }
     try {
       const [, deleted] = await sql.transaction([
