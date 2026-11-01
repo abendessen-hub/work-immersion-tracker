@@ -15,10 +15,10 @@ A React and TypeScript single-page app built with Vite.
    npm install
    ```
 
-2. Start the Vite development server:
+2. Start the Vercel development server:
 
    ```bash
-   npm run dev
+   npm run server
    ```
 
 3. Open the local URL printed in the terminal (usually `http://localhost:5173`).
