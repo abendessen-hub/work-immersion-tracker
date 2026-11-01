@@ -54,7 +54,7 @@ export default function CreateAccountPage() {
     selectedAccess?.access_name.toLowerCase() ?? "",
   );
 
-  const handleClickShowPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
