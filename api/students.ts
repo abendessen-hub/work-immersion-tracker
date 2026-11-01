@@ -168,8 +168,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           c.company_name,
           s.section_name
         FROM inserted_user u
-        LEFT JOIN company_reference c ON c.id = u.company_id
-        LEFT JOIN section_reference s ON s.id = u.section_id
+        LEFT JOIN company_reference c ON c.company_id = u.company_id
+        LEFT JOIN section_reference s ON s.section_id = u.section_id
     `,
     );
     const created = await sql.transaction(inserts);

@@ -101,11 +101,14 @@ vercel --prod
 Before using spreadsheet account creation, QR check-in, or attendance reports, run
 [`database/migrations/001_accounts_attendance.sql`](./database/migrations/001_accounts_attendance.sql)
 and [`database/migrations/002_company_geofence.sql`](./database/migrations/002_company_geofence.sql)
+and [`database/migrations/003_unlink_sections_company.sql`](./database/migrations/003_unlink_sections_company.sql)
 against the Neon database configured by `DATABASE_URL`. The first migration creates the reference
 tables `access_reference`, `company_reference`, `immersion_teacher`, and
 `section_reference`, along with `users` and `attendance_record` matching the
 provided Neon schema. The second migration adds company geofence coordinates and
 radius, including for databases created before location checks were added.
+The third migration removes the obsolete company assignment from section
+references; company is assigned directly to each user account.
 
 Add reference rows to `section_reference(section_name)` and
 `company_reference(company_name)` before importing students. Section/company names

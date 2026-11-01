@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "../../context/useAuth";
 import { getCurrentLocation } from "../../lib/geolocation";
 import SimpleButton from "../../components/simple-button";
+import RecordSearchPagination from "../../components/record-search-pagination";
+import { useRecordPagination } from "../../hooks/use-record-pagination";
 import DashboardLayout from "./layout";
 
 type Company = {
@@ -20,9 +22,7 @@ type AccessReference = {
 type Section = {
   section_id: number;
   section_name: string;
-  company_id: number | null;
   teacher_id: number | null;
-  company_name: string | null;
   teacher_name: string | null;
 };
 
@@ -41,7 +41,6 @@ type CompanyValues = {
 
 type SectionValues = {
   sectionName: string;
-  companyId: string;
 };
 
 const emptyCompany: CompanyValues = {
@@ -51,9 +50,16 @@ const emptyCompany: CompanyValues = {
   radiusMeters: "20",
 };
 
-const emptySection: SectionValues = { sectionName: "", companyId: "" };
+const emptySection: SectionValues = { sectionName: "" };
 
 const allowedAccess = { admin: 3, deployer: 4 };
+const companySearchFields = [
+  "company_name",
+] as const satisfies readonly (keyof Company)[];
+const sectionSearchFields = [
+  "section_name",
+  "teacher_name",
+] as const satisfies readonly (keyof Section)[];
 
 async function sendReference(method: string, values: object) {
   const response = await fetch("/api/reference", {
@@ -90,6 +96,8 @@ function ManageReferences() {
   const [locationBusy, setLocationBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
+  const companyPagination = useRecordPagination(companies, companySearchFields);
+  const sectionPagination = useRecordPagination(sections, sectionSearchFields);
 
   const loadReferences = useCallback(async () => {
     const response = await fetch("/api/reference");
@@ -252,17 +260,10 @@ function ManageReferences() {
           referenceType: "section",
           ...(editingSectionId === null ? {} : { sectionId: editingSectionId }),
           sectionName: sectionValues.sectionName,
-          companyId: sectionValues.companyId
-            ? Number(sectionValues.companyId)
-            : null,
         },
       );
       const section: Section = {
         ...result.section,
-        company_name:
-          companies.find(
-            (company) => company.company_id === result.section.company_id,
-          )?.company_name ?? null,
         teacher_name:
           sections.find((item) => item.section_id === result.section.section_id)
             ?.teacher_name ?? null,
@@ -295,7 +296,6 @@ function ManageReferences() {
     setEditingSectionId(section.section_id);
     setSectionValues({
       sectionName: section.section_name,
-      companyId: section.company_id === null ? "" : String(section.company_id),
     });
     setMessage("");
   };
@@ -488,7 +488,16 @@ function ManageReferences() {
             </form>
 
             <div className="reference-list" aria-label="Company references">
-              {companies.map((company) => (
+              <RecordSearchPagination
+                id="company-references"
+                query={companyPagination.query}
+                onQueryChange={companyPagination.setQuery}
+                page={companyPagination.page}
+                totalPages={companyPagination.totalPages}
+                resultCount={companyPagination.resultCount}
+                onPageChange={companyPagination.setPage}
+              />
+              {companyPagination.pageRecords.map((company) => (
                 <article className="reference-card" key={company.company_id}>
                   <div>
                     <h3 className="reference-card-title">
@@ -527,8 +536,12 @@ function ManageReferences() {
                   </div>
                 </article>
               ))}
-              {!companies.length ? (
-                <p className="dashboard-message">No company references yet.</p>
+              {!companyPagination.resultCount ? (
+                <p className="dashboard-message">
+                  {companyPagination.query
+                    ? "No companies match your search."
+                    : "No company references yet."}
+                </p>
               ) : null}
             </div>
           </section>
@@ -536,8 +549,8 @@ function ManageReferences() {
           <section className="dashboard-section reference-panel">
             <h2 className="dashboard-section-title">Section references</h2>
             <p className="dashboard-section-sub">
-              Assign sections to a company. Existing teacher assignments are
-              preserved when editing a section.
+              Sections are independent of companies. Existing teacher
+              assignments are preserved when editing a section.
             </p>
             <form
               className="dashboard-form reference-form"
@@ -558,32 +571,6 @@ function ManageReferences() {
                     maxLength={160}
                     required
                   />
-                </label>
-                <label
-                  className="form-field"
-                  htmlFor="reference-section-company"
-                >
-                  Company
-                  <select
-                    id="reference-section-company"
-                    value={sectionValues.companyId}
-                    onChange={(event) =>
-                      setSectionValues({
-                        ...sectionValues,
-                        companyId: event.target.value,
-                      })
-                    }
-                  >
-                    <option value="">No company assigned</option>
-                    {companies.map((company) => (
-                      <option
-                        key={company.company_id}
-                        value={company.company_id}
-                      >
-                        {company.company_name}
-                      </option>
-                    ))}
-                  </select>
                 </label>
               </div>
               <div className="dashboard-inline-actions">
@@ -609,19 +596,26 @@ function ManageReferences() {
                 ) : null}
               </div>
             </form>
-            {isAdmin && (
-              <div className="reference-list" aria-label="Section references">
-                {sections.map((section) => (
+            <div className="reference-list" aria-label="Section references">
+                <RecordSearchPagination
+                  id="section-references"
+                  query={sectionPagination.query}
+                  onQueryChange={sectionPagination.setQuery}
+                  page={sectionPagination.page}
+                  totalPages={sectionPagination.totalPages}
+                  resultCount={sectionPagination.resultCount}
+                  onPageChange={sectionPagination.setPage}
+                />
+                {sectionPagination.pageRecords.map((section) => (
                   <article className="reference-card" key={section.section_id}>
                     <div>
                       <h3 className="reference-card-title">
                         {section.section_name}
                       </h3>
                       <p className="reference-card-detail">
-                        {section.company_name ?? "No company assigned"}
                         {section.teacher_name
-                          ? ` · Teacher: ${section.teacher_name}`
-                          : ""}
+                          ? `Teacher: ${section.teacher_name}`
+                          : "No teacher assigned"}
                         {` · Section ID ${section.section_id}`}
                       </p>
                     </div>
@@ -651,13 +645,14 @@ function ManageReferences() {
                     </div>
                   </article>
                 ))}
-                {!sections.length ? (
+                {!sectionPagination.resultCount ? (
                   <p className="dashboard-message">
-                    No section references yet.
+                    {sectionPagination.query
+                      ? "No sections match your search."
+                      : "No section references yet."}
                   </p>
                 ) : null}
-              </div>
-            )}
+            </div>
           </section>
 
           <section className="dashboard-section reference-panel">

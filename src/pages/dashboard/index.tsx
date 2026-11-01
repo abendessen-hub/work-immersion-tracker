@@ -64,12 +64,12 @@ const actions = [
     to: "/dashboard/create-student-accounts",
   },
   {
-    title: "Create Teacher Accounts",
-    description: "Provision new Work Immersion teacher credentials.",
+    title: "Create Account",
+    description: "Create a user account and choose its access reference.",
     tag: "Admin",
     accessLevels: [3],
     icon: <BadgeIcon />,
-    to: "/dashboard/create-teacher-accounts",
+    to: "/dashboard/create-account",
   },
 ];
 

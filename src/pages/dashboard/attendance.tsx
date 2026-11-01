@@ -2,23 +2,35 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../context/useAuth";
 import DashboardLayout from "./layout";
 import SimpleButton from "../../components/simple-button";
+import RecordSearchPagination from "../../components/record-search-pagination";
 import { downloadWorkbook } from "../../utils/download-workbook";
+import { useRecordPagination } from "../../hooks/use-record-pagination";
 
 type AttendanceRecord = {
   user_id: number;
   full_name: string;
-  section_name: string;
-  company_name: string;
+  section_name: string | null;
+  company_name: string | null;
   date: string;
   time_in: string;
   time_out: string | null;
-  status: "Attended" | "Absent" | "No Time Out";
+  status?: "Attended" | "Absent" | "No Time Out";
 };
 
 type ReferenceData = {
   sections: { section_id: number; section_name: string }[];
   companies: { company_id: number; company_name: string }[];
 };
+
+const attendanceSearchFields = [
+  "full_name",
+  "section_name",
+  "company_name",
+  "date",
+  "time_in",
+  "time_out",
+  "status",
+] as const satisfies readonly (keyof AttendanceRecord)[];
 
 function formatTo12Hour(timeStr: string) {
   if (!timeStr) return "";
@@ -48,6 +60,7 @@ function AttendancePage() {
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [busy, setBusy] = useState(true);
   const [message, setMessage] = useState("");
+  const pagination = useRecordPagination(records, attendanceSearchFields);
 
   useEffect(() => {
     if (isStudent) return;
@@ -58,17 +71,20 @@ function AttendancePage() {
           throw new Error(data.error ?? "Could not load filters.");
         setReferences(data as ReferenceData);
         if (isTeacher) {
+          const referenceData = data as ReferenceData;
           setSectionId(
-            data.find(
-              (d: ReferenceData["sections"][number]) =>
-                d.section_id === user?.sectionId,
-            ),
+            referenceData.sections.some(
+              (section) => section.section_id === user?.sectionId,
+            )
+              ? String(user?.sectionId)
+              : "",
           );
           setCompanyId(
-            data.find(
-              (d: ReferenceData["companies"][number]) =>
-                d.company_id === user?.companyId,
-            ),
+            referenceData.companies.some(
+              (company) => company.company_id === user?.companyId,
+            )
+              ? String(user?.companyId)
+              : "",
           );
         }
       })
@@ -77,7 +93,7 @@ function AttendancePage() {
           error instanceof Error ? error.message : "Could not load filters.",
         );
       });
-  }, [isStudent]);
+  }, [isStudent, isTeacher, user?.companyId, user?.sectionId]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -92,7 +108,6 @@ function AttendancePage() {
         if (!response.ok)
           throw new Error(data.error ?? "Could not load attendance.");
         setRecords(data.records as AttendanceRecord[]);
-        console.log(data.records);
         setMessage("");
       })
       .catch((error: unknown) => {
@@ -130,7 +145,7 @@ function AttendancePage() {
         { header: "Status", key: "status", width: 20 },
       ];
       worksheet.addRows(
-        records.map((record) => ({
+        pagination.filteredRecords.map((record) => ({
           ...record,
           time_in: formatTo12Hour(record.time_in),
           time_out: record.time_out ? formatTo12Hour(record.time_out) : "",
@@ -256,7 +271,7 @@ function AttendancePage() {
             onClick={downloadReport}
             disabled={
               busy ||
-              !records.length ||
+              !pagination.resultCount ||
               (isStudent ? false : !date || !sectionId || !companyId)
             }
           >
@@ -277,7 +292,23 @@ function AttendancePage() {
           No attendance records match these filters.
         </p>
       ) : null}
-      {records.length ? (
+      {!busy && records.length > 0 ? (
+        <RecordSearchPagination
+          id="attendance"
+          query={pagination.query}
+          onQueryChange={pagination.setQuery}
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          resultCount={pagination.resultCount}
+          onPageChange={pagination.setPage}
+        />
+      ) : null}
+      {!busy && records.length > 0 && pagination.resultCount === 0 ? (
+        <p className="dashboard-section-sub">
+          No records match your search.
+        </p>
+      ) : null}
+      {pagination.pageRecords.length ? (
         <div className="attendance-table-wrap">
           <table className="placeholder-table">
             <thead>
@@ -291,11 +322,11 @@ function AttendancePage() {
               </tr>
             </thead>
             <tbody>
-              {records.map((record, index) => (
-                <tr key={index}>
+              {pagination.pageRecords.map((record) => (
+                <tr key={`${record.user_id}-${record.date}-${record.time_in}`}>
                   {!isStudent ? <td>{record.full_name}</td> : null}
-                  <td>{record.section_name}</td>
-                  <td>{record.company_name}</td>
+                  <td>{record.section_name ?? "—"}</td>
+                  <td>{record.company_name ?? "—"}</td>
                   <td>{new Date(record.date).toLocaleDateString()}</td>
                   <td>{formatTo12Hour(record.time_in)}</td>
                   <td>

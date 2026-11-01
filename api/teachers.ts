@@ -9,7 +9,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const session = getSession(req);
   if (!session) return res.status(401).json({ error: "Please sign in first" });
-  if (session.accessId < 3) {
+  if (session.accessId !== 3) {
     return res.status(403).json({ error: "Admin access is required" });
   }
 
@@ -43,7 +43,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     `,
       sql`SELECT section_id FROM section_reference WHERE lower(section_name) = ${sectionName}`,
       sql`SELECT company_id FROM company_reference WHERE lower(company_name) = ${companyName}`,
-      ,
     ]);
 
     if (!sectionExists.length) {
@@ -73,7 +72,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       INSERT INTO users
         (username, full_name, password, access_id, section_id, company_id, "changedPassword", contact_number)
       VALUES
-        (${username}, ${fullName}, ${passwordHash}, ${teacherAccess[0].access_id}, ${sectionExists[0].section_id}, ${companyExists[0].company_id}, true, ${contactNumber})
+        (${username}, ${fullName}, ${passwordHash}, ${teacherAccess[0].access_id}, ${sectionExists[0].section_id}, ${companyExists[0].company_id}, false, ${contactNumber})
       RETURNING user_id, username, full_name, access_id
     `;
 

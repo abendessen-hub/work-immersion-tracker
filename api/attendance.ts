@@ -85,8 +85,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                    a.date, a.time_in, a.time_out
             FROM attendance_record a
             JOIN users u ON u.user_id = a.user_id
-            JOIN section_reference s ON s.section_id = u.section_id
-            JOIN company_reference c ON c.company_id = u.company_id
+              LEFT JOIN section_reference s ON s.section_id = u.section_id
+              LEFT JOIN company_reference c ON c.company_id = u.company_id
             WHERE a.user_id = ${session.userId}
               AND (${date}::date IS NULL OR a.date >= ${date}::date)
             ORDER BY a.date DESC, a.time_in DESC
@@ -153,12 +153,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const users = await sql`
       SELECT u.user_id, u.access_id, u.section_id,
-             COALESCE(u.company_id, s.company_id) AS company_id,
+             u.company_id,
              c.latitude, c.longitude, c.radius_meters
       FROM users u
-      LEFT JOIN section_reference s ON s.section_id = u.section_id
       LEFT JOIN company_reference c
-        ON c.company_id = COALESCE(u.company_id, s.company_id)
+        ON c.company_id = u.company_id
       WHERE u.user_id = ${session.userId}
     `;
     const user = users[0];

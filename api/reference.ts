@@ -12,7 +12,6 @@ type CompanyInput = {
 
 type SectionInput = {
   sectionName: string;
-  companyId: number | null;
 };
 
 const allowedAccess = { admin: 3, deployer: 4 };
@@ -54,11 +53,8 @@ function companyInput(body: RequestBody): CompanyInput | null {
 
 function sectionInput(body: RequestBody): SectionInput | null {
   const sectionName = cleanName(body.sectionName);
-  const companyId = body.companyId;
-  if (!sectionName || (companyId !== null && !isPositiveInteger(companyId))) {
-    return null;
-  }
-  return { sectionName, companyId };
+  if (!sectionName) return null;
+  return { sectionName };
 }
 
 function isForeignKeyViolation(error: unknown): boolean {
@@ -92,10 +88,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         `,
         sql`
           SELECT
-            s.section_id, s.section_name, s.company_id, s.teacher_id,
-            c.company_name, t.teacher_name
+            s.section_id, s.section_name, s.teacher_id,
+            t.teacher_name
           FROM section_reference s
-          LEFT JOIN company_reference c ON c.company_id = s.company_id
           LEFT JOIN immersion_teacher t ON t.teacher_id = s.teacher_id
           ORDER BY s.section_name
         `,
@@ -282,26 +277,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const input = sectionInput(body);
       if (!input) {
         return res.status(400).json({
-          error:
-            "Enter a section name and select a valid company or no company",
+          error: "Enter a section name",
         });
       }
       const sectionId = body.sectionId;
       if (req.method === "PUT" && !isPositiveInteger(sectionId)) {
         return res.status(400).json({ error: "Invalid section reference" });
-      }
-
-      if (input.companyId !== null) {
-        const company = await sql`
-          SELECT company_id
-          FROM company_reference
-          WHERE company_id = ${input.companyId}
-        `;
-        if (!company.length) {
-          return res
-            .status(400)
-            .json({ error: "Selected company was not found" });
-        }
       }
 
       const duplicate = await sql`
@@ -319,19 +300,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (req.method === "POST") {
         const created = await sql`
-          INSERT INTO section_reference (section_name, company_id)
-          VALUES (${input.sectionName}, ${input.companyId})
-          RETURNING section_id, section_name, company_id, teacher_id
+          INSERT INTO section_reference (section_name)
+          VALUES (${input.sectionName})
+          RETURNING section_id, section_name, teacher_id
         `;
         return res.status(201).json({ section: created[0] });
       }
 
       const updated = await sql`
         UPDATE section_reference
-        SET section_name = ${input.sectionName},
-            company_id = ${input.companyId}
+        SET section_name = ${input.sectionName}
         WHERE section_id = ${sectionId}
-        RETURNING section_id, section_name, company_id, teacher_id
+        RETURNING section_id, section_name, teacher_id
       `;
       if (!updated.length) {
         return res.status(404).json({ error: "Section reference not found" });

@@ -27,8 +27,7 @@ CREATE TABLE IF NOT EXISTS immersion_teacher (
 CREATE TABLE IF NOT EXISTS section_reference (
   section_id SERIAL PRIMARY KEY,
   section_name TEXT NOT NULL,
-  teacher_id INTEGER REFERENCES immersion_teacher(teacher_id),
-  company_id INTEGER REFERENCES company_reference(company_id)
+  teacher_id INTEGER REFERENCES immersion_teacher(teacher_id)
 );
 
 CREATE TABLE IF NOT EXISTS users (

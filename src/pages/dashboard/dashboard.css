@@ -542,6 +542,24 @@
   gap: 10px;
 }
 
+.record-list-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+}
+
+.record-list-controls > .form-field {
+  flex: 1 1 220px;
+  max-width: 420px;
+}
+
+.record-list-count {
+  margin: 0 0 12px;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
 .reference-card {
   display: flex;
   align-items: center;
@@ -628,6 +646,19 @@
 
 .attendance-table-wrap .placeholder-table {
   min-width: 720px;
+}
+
+.attendance-table-wrap .account-table {
+  min-width: 1120px;
+  table-layout: auto;
+}
+
+.account-table th {
+  width: auto;
+}
+
+.account-edit-panel .dashboard-form {
+  max-width: none;
 }
 
 .table-grid-container {

@@ -15,7 +15,8 @@
    - [5.4 Create Student Accounts (Bulk Excel Import)](#54-create-student-accounts-bulk-excel-import)
    - [5.5 Manage References](#55-manage-references)
    - [5.6 Generate QR (Partner Company Setup)](#56-generate-qr-partner-company-setup)
-   - [5.7 Create Teacher Accounts](#57-create-teacher-accounts)
+   - [5.7 Create Account](#57-create-account)
+   - [5.8 Manage Accounts](#58-manage-accounts)
 6. [Troubleshooting & System Messages](#6-troubleshooting--system-messages)
 
 ---
@@ -33,18 +34,21 @@ The **Work Immersion Monitoring System (WIMS)** is a centralized web platform bu
 
 ## 2. User Roles & Access Matrix
 
-WIMS assigns system capabilities based on three hierarchical access levels. A checkmark (`Yes`) indicates the module is visible on the user's Dashboard.
+WIMS assigns system capabilities based on four access levels. A checkmark (`Yes`) indicates the module is available to the user's role.
 
-| System Capability / Module | Student (Level 1) | Teacher (Level 2) | Admin (Level 3) | | Deployer (Level 4)
+| System Capability / Module | Student (Level 1) | Teacher (Level 2) | Admin (Level 3) | Deployer (Level 4) |
 | :--- | :---: | :---: | :---: | :---: |
 | **Sign In & Session Management** | Yes | Yes | Yes | Yes |
-| **Mandatory First-Time Password Reset** | Yes | No | No |  No |
+| **Mandatory First-Time Password Reset** | Yes | No | No | No |
 | **Scan QR** (Log Daily Time In / Time Out) | Yes | No | No | No |
 | **Attendance** (Personal History & Export) | Yes | No | No | No |
 | **Attendance** (All Students, Filters & Export) | No | Yes | Yes | Yes |
 | **Create Student Accounts** (Bulk `.xlsx` Import) | No | Yes | Yes | No |
+| **Manage References — Companies & Sections** | No | No | Yes | Yes |
+| **Manage References — Access References** | No | No | Yes | No |
 | **Generate QR** (Partner Company PNGs) | No | No | Yes | Yes |
-| **Create Teacher Accounts** | No | No | Yes | No |
+| **Create Account** | No | No | Yes | No |
+| **Manage Accounts** | No | No | Yes | No |
 
 ---
 
@@ -52,7 +56,7 @@ WIMS assigns system capabilities based on three hierarchical access levels. A ch
 
 **For Administrators (Initial System Setup)**
 1. **Generate Company QR Codes:** Open **Generate QR**, select each partner company, download the PNG files, and send them to the respective deployment sites for display.
-2. **Onboard Immersion Teachers:** Open **Create Teacher Accounts** and register each supervising teacher.
+2. **Onboard Staff:** Open **Create Account**, enter account details, and select the correct access reference.
 3. **Provision or Monitor Students:** Assist teachers with bulk student imports or monitor school-wide attendance via the **Attendance** module.
 
 **For Immersion Teachers (Class Setup & Daily Monitoring)**
@@ -122,7 +126,8 @@ Once authenticated, the **Dashboard** displays interactive action cards correspo
    * **Time in recorded:** Total days with a verified arrival scan.
    * **Time out recorded:** Total days with a verified departure scan.
 3. *(Optional)* Select a date in the **Date** picker to filter records on or after that date.
-4. Click **Download Attendance Report.xlsx** to save a personal spreadsheet copy of your attendance logs.
+4. Search the matching records and use page controls to browse 20 items at a time.
+5. Click **Download Attendance Report.xlsx** to save a personal spreadsheet copy of the matching attendance logs.
 
 #### B. Teacher & Admin View
 1. Select **Attendance** from the Dashboard.
@@ -131,7 +136,8 @@ Once authenticated, the **Dashboard** displays interactive action cards correspo
    * **Date:** Displays attendance records starting on or after the chosen date.
    * **Section:** Filters students belonging to a specific class section.
    * **Company:** Filters students deployed to a specific partner company.
-4. Once **Date**, **Section**, and **Company** are all selected (and matching records exist), the **Download Attendance Report.xlsx** button becomes active. Click it to export the official attendance sheet.
+4. Search the matching records and use page controls to browse 20 items at a time.
+5. Once **Date**, **Section**, and **Company** are all selected (and matching records exist), the **Download Attendance Report.xlsx** button becomes active. Click it to export the matching attendance records.
 
 **Understanding Exported Attendance Statuses:**
 * `Attended`: The student successfully logged both **Time In** and **Time Out** for the day.
@@ -144,7 +150,7 @@ Once authenticated, the **Dashboard** displays interactive action cards correspo
 
 **Step 1: Check Reference Names & Download the Template**
 1. Open **Create Student Accounts** from the Dashboard.
-2. Review the on-screen **Company** and **Section** reference tables. Every student row in your spreadsheet must match these exact system names (case-insensitive).
+2. Review the on-screen **Company** and **Section** reference tables. Search as needed; tables show up to 20 items per page. Every student row in your spreadsheet must match these exact system names (case-insensitive).
 3. Click **Download Template** to save `student-account-template.xlsx` to your computer.
 
 **Step 2: Populate the Spreadsheet**
@@ -168,11 +174,13 @@ Fill out each column in `student-account-template.xlsx` without renaming or reor
 5. Your browser will automatically download `student-accounts.xlsx`, which contains each student's generated **Username** and **Temporary Password**. Distribute these credentials privately to each student.
 
 ### 5.5 Manage References
-**Access:** Admins only (Level 3); deployer access can also be enabled in the backend if configured.  
-**Purpose:** Maintains the master records used by the rest of the system, including partner companies, class sections, and access reference names.
+**Access:** Admins (Level 3) can manage companies, sections, and access references. Deployers (Level 4) can manage companies and sections only; access references are restricted to admins.
+
+**Purpose:** Maintains partner company and class section records used by the rest of the system. Admins can also manage access reference names.
 
 1. Open **Manage References** from the Dashboard.
-2. Use the tabs or sections for **Company**, **Section**, and **Access Reference**.
+2. Admins can use **Company**, **Section**, and **Access Reference**. Deployers can use **Company** and **Section** only.
+3. Use each section's search field and page controls to browse matching records; each page shows up to 20 items. Access references remain a separate admin-only list.
 
 #### Company references
 Each company record can include its name, geographic coordinates, and allowed check-in radius.
@@ -190,12 +198,11 @@ Each company record can include its name, geographic coordinates, and allowed ch
 3. Confirm the deletion when prompted.
 
 #### Section references
-A section is tied to a specific company and can be assigned to a teacher or class.
+A section is an independent reference. Company assignment is set on each user account and is not inherited from the section.
 
 ##### Creating or updating a section
-1. Select the company from the dropdown list.
-2. Enter the section name.
-3. Click **Create Section** or **Save Section** to keep the record.
+1. Enter the section name.
+2. Click **Create Section** or **Save Section** to keep the record.
 
 ##### Deleting a section
 1. Select the section from the list.
@@ -214,7 +221,7 @@ Access reference values are system-level labels used to identify roles. Built-in
 2. Click **Delete**.
 
 ### 5.6 Generate QR (Partner Company Setup)
-**Access:** Admins only (Level 3)  
+**Access:** Admins (Level 3) and Deployers (Level 4)
 **Purpose:** Produces official, verifiable check-in QR code images for partner immersion sites.
 
 1. Open **Generate QR** from the Dashboard.
@@ -223,19 +230,29 @@ Access reference values are system-level labels used to identify roles. Built-in
 4. Click **Download PNG** to save the image file.
 5. Print or distribute the downloaded file to the partner company supervisor to post at the check-in area.
 
-### 5.7 Create Teacher Accounts
-**Access:** Admins only (Level 3)  
-**Purpose:** Registers new Work Immersion Teachers (Access Level 2) in WIMS.
+### 5.7 Create Account
+**Access:** Admins only (Level 3)
+**Purpose:** Creates an account with the selected access reference.
 
-1. Open **Create Teacher Accounts** from the Dashboard.
+1. Open **Create Account** from the Dashboard.
 2. Complete all required form fields:
-   * **Full name:** Teacher's complete name (e.g., `Juan Dela Cruz`).
+   * **Full name:** Account holder's complete name (e.g., `Juan Dela Cruz`).
    * **Username:** Unique login identifier (lowercase recommended, no spaces).
-   * **Section:** Section assignment associated with the teacher.
-   * **Company:** Assigned partner company.
+   * **Section:** Assigned section.
+   * **Company:** Assigned company. Section and company are selected independently.
+   * **Access reference:** Role to assign to this account.
    * **Password:** Initial login password (minimum **6 characters**).
    * **Contact number:** Active mobile number (e.g., `09XX XXX XXXX`).
-3. Click **Create Account**. A confirmation message appears when the teacher account is successfully created.
+3. Click **Create Account**. Account holder must change initial password at first sign-in.
+
+### 5.8 Manage Accounts
+**Access:** Admins only (Level 3)
+**Purpose:** Search, update, and remove accounts.
+
+1. Open **Manage Accounts** from the Dashboard.
+2. Search by name, username, access reference, section, company, or contact number. Use page controls to browse 20 accounts at a time.
+3. Click **Edit** to update name, username, access reference, section, company, or contact number. Enter a new password only when resetting it; the user will be asked to change that password at next sign-in.
+4. Click **Delete** and confirm to remove an account. Deleting an account also permanently deletes its attendance records. Admins cannot delete their own active account.
 
 ---
 

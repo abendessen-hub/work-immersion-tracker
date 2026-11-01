@@ -1,5 +1,11 @@
 import "./App.css";
-import { useState, type FormEvent, type MouseEvent } from "react";
+import {
+  lazy,
+  Suspense,
+  useState,
+  type FormEvent,
+  type MouseEvent,
+} from "react";
 import {
   Navigate,
   Route,
@@ -8,14 +14,6 @@ import {
   useNavigate,
 } from "react-router-dom";
 import SimpleButton from "./components/simple-button";
-import DashboardPage from "./pages/dashboard";
-import ScanQrPage from "./pages/dashboard/scan-qr";
-import ManageReferences from "./pages/dashboard/manage-references";
-import ManageAccounts from "./pages/dashboard/manage-accounts";
-import GenerateQrPage from "./pages/dashboard/generate-qr";
-import AttendancePage from "./pages/dashboard/attendance";
-import CreateStudentAccountsPage from "./pages/dashboard/create-student-accounts";
-import CreateTeacherAccountsPage from "./pages/dashboard/create-teacher-accounts";
 import Form from "./components/form";
 import ModalBackdrop from "./components/modal-backdrop";
 
@@ -30,6 +28,23 @@ import SchoolLogo from "./assets/school_logo.jpg";
 import { AuthProvider } from "./context/AuthContext";
 import { useAuth } from "./context/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
+
+const DashboardPage = lazy(() => import("./pages/dashboard"));
+const ScanQrPage = lazy(() => import("./pages/dashboard/scan-qr"));
+const ManageReferences = lazy(
+  () => import("./pages/dashboard/manage-references"),
+);
+const ManageAccounts = lazy(
+  () => import("./pages/dashboard/manage-accounts"),
+);
+const GenerateQrPage = lazy(() => import("./pages/dashboard/generate-qr"));
+const AttendancePage = lazy(() => import("./pages/dashboard/attendance"));
+const CreateStudentAccountsPage = lazy(
+  () => import("./pages/dashboard/create-student-accounts"),
+);
+const CreateAccountPage = lazy(
+  () => import("./pages/dashboard/create-account"),
+);
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -389,83 +404,89 @@ function AppContent() {
   return (
     <main className="page-background">
       <div className="rail" aria-hidden="true" />
-      <Routes>
-        <Route path="/" element={<LoginPage />} />
+      <Suspense fallback={<p role="status">Loading page...</p>}>
+        <Routes>
+          <Route path="/" element={<LoginPage />} />
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/scan-qr"
-          element={
-            <ProtectedRoute>
-              <ScanQrPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/manage-references"
-          element={
-            <ProtectedRoute>
-              <ManageReferences />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/manage-accounts"
-          element={
-            <ProtectedRoute>
-              <ManageAccounts />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/generate-qr"
-          element={
-            <ProtectedRoute>
-              <GenerateQrPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/attendance"
-          element={
-            <ProtectedRoute>
-              <AttendancePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/create-student-accounts"
-          element={
-            <ProtectedRoute>
-              <CreateStudentAccountsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/create-teacher-accounts"
-          element={
-            <ProtectedRoute>
-              <CreateTeacherAccountsPage />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/scan-qr"
+            element={
+              <ProtectedRoute>
+                <ScanQrPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/manage-references"
+            element={
+              <ProtectedRoute>
+                <ManageReferences />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/manage-accounts"
+            element={
+              <ProtectedRoute>
+                <ManageAccounts />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/generate-qr"
+            element={
+              <ProtectedRoute>
+                <GenerateQrPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/attendance"
+            element={
+              <ProtectedRoute>
+                <AttendancePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/create-student-accounts"
+            element={
+              <ProtectedRoute>
+                <CreateStudentAccountsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/create-account"
+            element={
+              <ProtectedRoute>
+                <CreateAccountPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/create-teacher-accounts"
+            element={<Navigate to="/dashboard/create-account" replace />}
+          />
 
-        <Route
-          path="*"
-          element={
-            <ProtectedRoute>
-              <Navigate to="/dashboard" replace />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+          <Route
+            path="*"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/dashboard" replace />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Suspense>
 
       <footer className="site-footer">
         <div className="footer-brand">

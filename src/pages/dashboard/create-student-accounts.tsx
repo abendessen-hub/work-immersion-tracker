@@ -1,7 +1,9 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import DashboardLayout from "./layout";
 import SimpleButton from "../../components/simple-button";
+import RecordSearchPagination from "../../components/record-search-pagination";
 import { downloadWorkbook } from "../../utils/download-workbook";
+import { useRecordPagination } from "../../hooks/use-record-pagination";
 
 type ImportRow = {
   lrn: string;
@@ -74,6 +76,14 @@ type ReferenceData = {
   sections: { section_id: number; section_name: string }[];
   companies: { company_id: number; company_name: string }[];
 };
+
+const companySearchFields = [
+  "company_name",
+] as const satisfies readonly (keyof ReferenceData["companies"][number])[];
+const sectionSearchFields = [
+  "section_name",
+] as const satisfies readonly (keyof ReferenceData["sections"][number])[];
+
 function CreateStudentAccountsPage() {
   const [rows, setRows] = useState<ImportRow[]>([]);
   const [fileName, setFileName] = useState("");
@@ -84,6 +94,14 @@ function CreateStudentAccountsPage() {
     sections: [],
     companies: [],
   });
+  const companyPagination = useRecordPagination(
+    references.companies,
+    companySearchFields,
+  );
+  const sectionPagination = useRecordPagination(
+    references.sections,
+    sectionSearchFields,
+  );
 
   useEffect(() => {
     fetch("/api/reference-data")
@@ -98,7 +116,7 @@ function CreateStudentAccountsPage() {
           error instanceof Error ? error.message : "Could not load filters.",
         );
       });
-  });
+  }, []);
 
   const readSpreadsheet = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -233,6 +251,15 @@ function CreateStudentAccountsPage() {
         </p>
         <div className="table-grid-container">
           <div className="table-wrap">
+            <RecordSearchPagination
+              id="import-companies"
+              query={companyPagination.query}
+              onQueryChange={companyPagination.setQuery}
+              page={companyPagination.page}
+              totalPages={companyPagination.totalPages}
+              resultCount={companyPagination.resultCount}
+              onPageChange={companyPagination.setPage}
+            />
             <table className="placeholder-table">
               <thead>
                 <tr>
@@ -240,15 +267,31 @@ function CreateStudentAccountsPage() {
                 </tr>
               </thead>
               <tbody>
-                {references.companies.map((record, index) => (
-                  <tr key={index}>
+                {companyPagination.pageRecords.map((record) => (
+                  <tr key={record.company_id}>
                     <td>{record.company_name}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            {!companyPagination.resultCount ? (
+              <p className="dashboard-section-sub">
+                {companyPagination.query
+                  ? "No companies match your search."
+                  : "No company references yet."}
+              </p>
+            ) : null}
           </div>
           <div className="table-wrap">
+            <RecordSearchPagination
+              id="import-sections"
+              query={sectionPagination.query}
+              onQueryChange={sectionPagination.setQuery}
+              page={sectionPagination.page}
+              totalPages={sectionPagination.totalPages}
+              resultCount={sectionPagination.resultCount}
+              onPageChange={sectionPagination.setPage}
+            />
             <table className="placeholder-table">
               <thead>
                 <tr>
@@ -256,13 +299,20 @@ function CreateStudentAccountsPage() {
                 </tr>
               </thead>
               <tbody>
-                {references.sections.map((record, index) => (
-                  <tr key={index}>
+                {sectionPagination.pageRecords.map((record) => (
+                  <tr key={record.section_id}>
                     <td>{record.section_name}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            {!sectionPagination.resultCount ? (
+              <p className="dashboard-section-sub">
+                {sectionPagination.query
+                  ? "No sections match your search."
+                  : "No section references yet."}
+              </p>
+            ) : null}
           </div>
         </div>
 
