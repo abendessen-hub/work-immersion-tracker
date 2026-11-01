@@ -72,6 +72,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .status(400)
         .json({ error: "Invalid section or company filter" });
     }
+    const includeAbsences =
+      date !== null && sectionId !== null && companyId !== null;
 
     try {
       const records =
@@ -79,32 +81,48 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           ? await sql`
             SELECT a.user_id, u.full_name,
                    s.section_name, c.company_name,
-                   a.date, a.time_in, a.time_out
+                   a.date, a.time_in, a.time_out,
+                   CASE
+                     WHEN a.time_out IS NULL THEN 'No Time Out'
+                     ELSE 'Attended'
+                   END AS status
             FROM attendance_record a
             JOIN users u ON u.user_id = a.user_id
               LEFT JOIN section_reference s ON s.section_id = u.section_id
               LEFT JOIN company_reference c ON c.company_id = u.company_id
             WHERE a.user_id = ${session.userId}
-              AND (${date}::date IS NULL OR a.date >= ${date}::date)
+              AND (${date}::date IS NULL OR a.date = ${date}::date)
             ORDER BY a.date DESC, a.time_in DESC
             LIMIT 5000
           `
           : await sql`
            SELECT u.user_id, u.full_name,
                   s.section_name, c.company_name,
-                  a.date, a.time_in, a.time_out,
+                  CASE
+                    WHEN a.record_id IS NULL THEN ${date}::date
+                    ELSE a.date
+                  END AS date,
+                  a.time_in, a.time_out,
                   CASE
                       WHEN a.record_id IS NULL THEN 'Absent'
                       WHEN a.time_out IS NULL THEN 'No Time Out'
                       ELSE 'Attended'
                   END AS status
           FROM users u
-          LEFT JOIN attendance_record a ON u.user_id = a.user_id
+          LEFT JOIN attendance_record a
+            ON u.user_id = a.user_id
+              AND (
+                (${includeAbsences}::boolean AND a.date = ${date}::date)
+                OR (
+                  NOT ${includeAbsences}::boolean
+                  AND (${date}::date IS NULL OR a.date = ${date}::date)
+                )
+              )
           LEFT JOIN section_reference s ON s.section_id = u.section_id
           LEFT JOIN company_reference c ON c.company_id = u.company_id
           WHERE (${sectionId}::int IS NULL OR u.section_id = ${sectionId})
             AND (${companyId}::int IS NULL OR u.company_id = ${companyId})
-            AND (${date}::date IS NULL OR a.date >= ${date}::date OR a.date IS NULL)
+            AND (${includeAbsences}::boolean OR a.record_id IS NOT NULL)
             AND (u.access_id = 1)
           ORDER BY a.date DESC, a.time_in DESC
           LIMIT 5000

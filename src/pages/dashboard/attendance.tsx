@@ -11,8 +11,8 @@ type AttendanceRecord = {
   full_name: string;
   section_name: string | null;
   company_name: string | null;
-  date: string;
-  time_in: string;
+  date: string | null;
+  time_in: string | null;
   time_out: string | null;
   status?: "Attended" | "Absent" | "No Time Out";
 };
@@ -32,7 +32,7 @@ const attendanceSearchFields = [
   "status",
 ] as const satisfies readonly (keyof AttendanceRecord)[];
 
-function formatTo12Hour(timeStr: string) {
+function formatTo12Hour(timeStr: string | null) {
   if (!timeStr) return "";
   const [hourStr, minuteStr] = timeStr.split(":");
   let hours = parseInt(hourStr, 10);
@@ -149,7 +149,14 @@ function AttendancePage() {
           ...record,
           time_in: formatTo12Hour(record.time_in),
           time_out: record.time_out ? formatTo12Hour(record.time_out) : "",
-          date: new Date(record.date).toLocaleDateString(),
+          date: record.date ? new Date(record.date).toLocaleDateString() : "—",
+          status:
+            record.status ??
+            (record.time_in
+              ? record.time_out
+                ? "Attended"
+                : "No Time Out"
+              : "Absent"),
         })),
       );
       worksheet.getRow(1).font = { bold: true };
@@ -314,6 +321,7 @@ function AttendancePage() {
             <thead>
               <tr>
                 {!isStudent ? <th scope="col">Student</th> : null}
+                <th scope="col">Status</th>
                 <th scope="col">Section</th>
                 <th scope="col">Company</th>
                 <th scope="col">Date</th>
@@ -325,9 +333,14 @@ function AttendancePage() {
               {pagination.pageRecords.map((record) => (
                 <tr key={`${record.user_id}-${record.date}-${record.time_in}`}>
                   {!isStudent ? <td>{record.full_name}</td> : null}
+                  <td>{record.status}</td>
                   <td>{record.section_name ?? "—"}</td>
                   <td>{record.company_name ?? "—"}</td>
-                  <td>{new Date(record.date).toLocaleDateString()}</td>
+                  <td>
+                    {record.date
+                      ? new Date(record.date).toLocaleDateString()
+                      : "—"}
+                  </td>
                   <td>{formatTo12Hour(record.time_in)}</td>
                   <td>
                     {record.time_out ? formatTo12Hour(record.time_out) : "—"}

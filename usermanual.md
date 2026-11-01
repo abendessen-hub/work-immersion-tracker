@@ -71,7 +71,7 @@ WIMS implements role-based access control (RBAC) across four standard access lev
 ### For Immersion Teachers (Level 2)
 1. **Prepare Class Lists:** Open **Create Student Accounts**, download the standardized Excel template (`student-account-template.xlsx`), and input student information. Verify that Section and Company names precisely match active system references.
 2. **Bulk Provision Students:** Upload the filled workbook. Download the generated `student-accounts.xlsx` file and securely distribute usernames and temporary passwords to your students.
-3. **Daily Attendance Supervision:** Open **Attendance**, filter by **Date**, **Section**, and **Company**, and inspect attendance statuses (`Attended`, `No Time Out`, or `Absent`).
+3. **Daily Attendance Supervision:** Open **Attendance** and filter by **Date**, **Section**, and **Company** to include students with no attendance record for that date. Attendance status appears in the table and downloaded report.
 4. **Export Grading Sheets:** Click **Download Attendance Report.xlsx** to produce official reports for academic grading and DepEd compliance records.
 
 ### For Students / Trainees (Level 1)
@@ -140,11 +140,11 @@ The WIMS dashboard adopts a clean, professional, and minimalist aesthetic:
 #### Teacher, Admin, & Deployer View
 * Displays aggregate metrics: **Student records**, total **Students**, **Time in recorded**, and **Time out recorded**.
 * **Filter Panel Controls:**
-  * **Date:** Filter records starting on or matching the selected date.
+  * **Date:** Filter records starting on or matching the selected date. When **Date**, **Section**, and **Company** are all selected, the page matches that exact date and also includes students with no record on it.
   * **Section:** Filter by class section (Teachers are pre-filtered to their assigned section).
   * **Company:** Filter by immersion partner company.
-* **Paginated Records:** Browse large attendance lists with search input and pagination buttons (showing 20 records per page).
-* **Exporting to Excel:** When the required filter parameters (**Date**, **Section**, and **Company**) are selected, click **Download Attendance Report.xlsx** to generate the styled spreadsheet.
+* **Paginated Records:** Browse large attendance lists with status, search input, and pagination buttons (showing 20 records per page). Absent students appear only when all three filters are selected.
+* **Exporting to Excel:** When the required filter parameters (**Date**, **Section**, and **Company**) are selected, click **Download Attendance Report.xlsx** to generate the styled spreadsheet with attendance statuses.
 
 **Status Code Definitions:**
 * `Attended`: Trainee logged both an arrival scan and a departure scan for the day.
