@@ -1,3 +1,9 @@
+/* ============================================================
+   WIMS Dashboard — Minimalist Professional Theme
+   ============================================================ */
+
+/* ---- main card container ---- */
+
 .dashboard-card {
   position: relative;
   z-index: 1;
@@ -23,6 +29,8 @@
   flex-direction: column;
   gap: clamp(22px, 3vw, 32px);
 }
+
+/* ---- header ---- */
 
 .dashboard-header {
   display: flex;
@@ -101,7 +109,7 @@
 }
 
 .dashboard-description {
-  max-width: 100ch;
+  max-width: 60ch;
   margin: 10px 0 0;
   color: var(--color-muted);
   font-size: 15px;
@@ -460,38 +468,50 @@
   background: var(--color-primary);
 }
 
-/* ---- placeholder pages ---- */
+/* ============================================================
+   Tables — Professional styling with clear contrast
+   ============================================================ */
 
 .placeholder-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   background: #ffffff;
   border: 1px solid #d5e3fb;
-  border-radius: 18px;
+  border-radius: 14px;
   overflow: hidden;
   font-size: 14px;
 }
 
 .placeholder-table th,
 .placeholder-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #e4eefc;
+  padding: 13px 16px;
+  border-bottom: 1px solid #eaeff8;
   text-align: left;
   color: var(--color-text);
   line-height: 1.5;
 }
 
 .placeholder-table th {
-  background: #f2f7ff;
-  color: var(--color-muted);
-  font-size: 12px;
-  font-weight: 750;
-  letter-spacing: 0.06em;
+  background: #f5f7fb;
+  color: #3d5278;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
+  border-bottom: 2px solid #dce5f2;
 }
 
 .placeholder-table tbody tr:last-child td {
   border-bottom: 0;
+}
+
+.placeholder-table tbody tr:nth-child(even) {
+  background: #fafbfd;
+}
+
+.placeholder-table tbody tr:hover {
+  background: #f0f4fa;
 }
 
 .placeholder-table td:first-child,
@@ -504,84 +524,15 @@
   padding-right: 20px;
 }
 
-/* ---- forms ---- */
+/* ============================================================
+   Forms & Inputs — Clean surfaces with proper contrast
+   ============================================================ */
 
 .dashboard-form {
   display: grid;
   justify-items: start;
   gap: 14px;
   max-width: 460px;
-}
-
-.reference-management {
-  display: grid;
-  gap: 28px;
-}
-
-.reference-panel {
-  padding: 22px;
-  border: 1px solid #d9e6fb;
-  border-radius: 18px;
-  background: linear-gradient(165deg, #ffffff 0%, #f9fbff 100%);
-}
-
-.reference-form {
-  width: 100%;
-  max-width: none;
-}
-
-.reference-form-grid {
-  display: grid;
-  width: 100%;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.reference-list {
-  display: grid;
-  gap: 10px;
-}
-
-.record-list-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: end;
-  gap: 12px;
-}
-
-.record-list-controls > .form-field {
-  flex: 1 1 220px;
-  max-width: 420px;
-}
-
-.record-list-count {
-  margin: 0 0 12px;
-  color: var(--color-muted);
-  font-size: 13px;
-}
-
-.reference-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px 16px;
-  border: 1px solid #e1eaf8;
-  border-radius: 12px;
-  background: #fff;
-}
-
-.reference-card-title {
-  margin: 0;
-  color: var(--color-text);
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.reference-card-detail {
-  margin: 4px 0 0;
-  color: var(--color-muted);
-  font-size: 13px;
 }
 
 .dashboard-inline-actions {
@@ -657,9 +608,18 @@
   width: auto;
 }
 
+.account-edit-panel {
+  padding: 24px;
+  border: 1px solid #dce5f2;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
 .account-edit-panel .dashboard-form {
   max-width: none;
 }
+
+/* ---- two-column reference tables (create-student-accounts) ---- */
 
 .table-grid-container {
   display: grid;
@@ -675,21 +635,228 @@
   overflow-x: auto;
 }
 
-.placeholder-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
+/* ============================================================
+   Record List Controls (Search & Pagination)
+   ============================================================ */
+
+.record-list-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 4px 0;
 }
 
-.placeholder-table th {
-  width: 100%;
-  box-sizing: border-box;
+.record-list-controls > .form-field {
+  flex: 1 1 240px;
+  max-width: 420px;
+  margin: 0;
 }
 
-.dashboard-card :is(.logout-btn, .action-card):focus-visible {
+.record-list-count {
+  color: var(--color-muted);
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.record-list-controls .dashboard-inline-actions {
+  align-items: center;
+  gap: 10px;
+}
+
+.record-list-controls span[aria-live="polite"] {
+  font-size: 13.5px;
+  color: var(--color-muted);
+  font-weight: 600;
+  padding: 0 4px;
+}
+
+/* ============================================================
+   Form Inputs & Search Field — Clean white input
+   ============================================================ */
+
+.dashboard-card input,
+.dashboard-card select,
+.dashboard-card textarea {
+  background: #ffffff;
+  border: 1px solid #d0ddf0;
+  border-radius: 10px;
+  color: var(--color-text);
+  font-size: 14px;
+  padding: 10px 14px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.dashboard-card input:focus,
+.dashboard-card select:focus,
+.dashboard-card textarea:focus {
+  border-color: var(--color-border-strong);
+  box-shadow: 0 0 0 3px rgba(78, 134, 255, 0.12);
+  outline: none;
+}
+
+.dashboard-card input::placeholder {
+  color: #9aacc8;
+  opacity: 1;
+}
+
+/* ============================================================
+   Reference Management — Panels, forms, cards
+   ============================================================ */
+
+.reference-management {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.reference-panel {
+  padding: 24px;
+  border: 1px solid #dce5f2;
+  border-radius: 18px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reference-form {
+  max-width: 100%;
+}
+
+.reference-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  width: 100%;
+}
+
+.reference-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.reference-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 1px solid #e2eaf6;
+  border-radius: 14px;
+  background: #fafcff;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.reference-card:hover {
+  border-color: #c5d6f2;
+  box-shadow: 0 4px 12px rgba(20, 56, 120, 0.05);
+}
+
+.reference-card-title {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.reference-card-detail {
+  margin: 3px 0 0;
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* ============================================================
+   Manage Accounts & Action Buttons
+   ============================================================ */
+
+.placeholder-table td a,
+.placeholder-table td button.link-button {
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.placeholder-table td a:hover,
+.placeholder-table td button.link-button:hover {
+  background: #edf3ff;
+  border-color: #d0ddf0;
+}
+
+/* ============================================================
+   Buttons — Strict hierarchy & clear disabled state
+   ============================================================ */
+
+.simple-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.simple-button--primary {
+  background: var(--color-primary);
+  color: #ffffff;
+  border: 1px solid transparent;
+  box-shadow: 0 2px 6px rgba(20, 86, 206, 0.12);
+}
+
+.simple-button--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  box-shadow: 0 4px 12px rgba(20, 86, 206, 0.18);
+}
+
+.simple-button--secondary {
+  border: 1px solid #c9ddff;
+  background: #ffffff;
+  color: var(--color-primary);
+  box-shadow: 0 1px 3px rgba(20, 86, 206, 0.04);
+}
+
+.simple-button--secondary:hover:not(:disabled) {
+  border-color: var(--color-border-strong);
+  background: #f0f6ff;
+  color: var(--color-primary-hover);
+}
+
+.simple-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  background: #e9eff8 !important;
+  color: #8fa0ba !important;
+  border-color: #d4e0f0 !important;
+  box-shadow: none !important;
+}
+
+/* ============================================================
+   Focus & accessibility
+   ============================================================ */
+
+.dashboard-card :is(.logout-btn, .action-card, .simple-button):focus-visible {
   outline: 3px solid var(--color-border-strong);
   outline-offset: 3px;
 }
+
+/* ============================================================
+   Responsive breakpoints
+   ============================================================ */
 
 @media (max-width: 900px) {
   .dashboard-actions {
@@ -699,20 +866,15 @@
   .stat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .reference-form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 600px) {
   .table-grid-container {
     grid-template-columns: 1fr;
-  }
-
-  .reference-form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .reference-card {
-    align-items: flex-start;
-    flex-direction: column;
     width: 100%;
     margin: 0 auto;
   }
@@ -783,6 +945,24 @@
   .stat-grid {
     grid-template-columns: minmax(0, 1fr);
   }
+
+  .reference-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .reference-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .record-list-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .record-list-controls > .form-field {
+    max-width: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -790,7 +970,8 @@
   .action-card,
   .action-icon,
   .action-arrow,
-  .action-card-foot {
+  .action-card-foot,
+  .simple-button {
     transition: none;
   }
 
