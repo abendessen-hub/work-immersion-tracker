@@ -112,8 +112,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (
       !fullName ||
       !username ||
-      !sectionName ||
-      !companyName ||
       !contactNumber ||
       !password ||
       !accessId ||
@@ -128,25 +126,40 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     try {
-      const [section, company, access] = await Promise.all([
-        sql`SELECT section_id FROM section_reference WHERE lower(section_name) = lower(${sectionName}) LIMIT 1`,
-        sql`SELECT company_id FROM company_reference WHERE lower(company_name) = lower(${companyName}) LIMIT 1`,
-        sql`SELECT access_id FROM access_reference WHERE access_id = ${accessId}`,
-      ]);
-      if (!section.length) {
-        return res
-          .status(400)
-          .json({ error: `Section "${sectionName}" was not found.` });
-      }
-      if (!company.length) {
-        return res
-          .status(400)
-          .json({ error: `Company "${companyName}" was not found.` });
-      }
+      const access =
+        await sql`SELECT access_id, access_name FROM access_reference WHERE access_id = ${accessId}`;
       if (!access.length) {
         return res
           .status(400)
           .json({ error: "Selected access reference was not found." });
+      }
+      const sectionAndCompanyOptional = ["admin", "deployer"].includes(
+        String(access[0].access_name).toLowerCase(),
+      );
+      if ((!sectionName || !companyName) && !sectionAndCompanyOptional) {
+        return res
+          .status(400)
+          .json({
+            error: "Section and company are required for this account.",
+          });
+      }
+      const [section, company] = await Promise.all([
+        sectionName
+          ? sql`SELECT section_id FROM section_reference WHERE lower(section_name) = lower(${sectionName}) LIMIT 1`
+          : Promise.resolve([]),
+        companyName
+          ? sql`SELECT company_id FROM company_reference WHERE lower(company_name) = lower(${companyName}) LIMIT 1`
+          : Promise.resolve([]),
+      ]);
+      if (sectionName && !section.length) {
+        return res
+          .status(400)
+          .json({ error: `Section "${sectionName}" was not found.` });
+      }
+      if (companyName && !company.length) {
+        return res
+          .status(400)
+          .json({ error: `Company "${companyName}" was not found.` });
       }
 
       const existing =
@@ -162,7 +175,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         INSERT INTO users
           (username, full_name, password, access_id, section_id, company_id, "changedPassword", contact_number)
         VALUES
-          (${username}, ${fullName}, ${passwordHash}, ${accessId}, ${section[0].section_id}, ${company[0].company_id}, ${changedPassword}, ${contactNumber})
+          (${username}, ${fullName}, ${passwordHash}, ${accessId}, ${section[0]?.section_id ?? null}, ${company[0]?.company_id ?? null}, ${changedPassword}, ${contactNumber})
         RETURNING user_id, username, full_name, access_id
       `;
       return res.status(201).json({ user: created[0] });

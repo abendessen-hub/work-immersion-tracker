@@ -7,6 +7,10 @@ import SimpleButton from "../../components/simple-button";
 
 function ScanQrPage() {
   const { user } = useAuth();
+  const isLocationTestAccount =
+    user?.username.toLowerCase() === "1059student" &&
+    user.sectionId === 1059 &&
+    user.companyId === 1059;
   const scannerRef = useRef<Html5QrcodeInstance | null>(null);
   const processingRef = useRef(false);
   const [isScanning, setIsScanning] = useState(false);
@@ -46,6 +50,14 @@ function ScanQrPage() {
     const result = await response.json();
     if (!response.ok)
       throw new Error(result.error ?? "Attendance could not be recorded.");
+
+    if (result.testOnly === true) {
+      setIsError(false);
+      setMessage(
+        `Location check passed for ${result.companyName} (${result.distanceMeters} m away; ${result.radiusMeters} m allowed). Attendance was not recorded.`,
+      );
+      return;
+    }
 
     const action = result.action === "time-in" ? "Time in" : "Time out";
     setIsError(false);
@@ -135,16 +147,20 @@ function ScanQrPage() {
     <DashboardLayout
       eyebrow="Work Immersion Monitoring System (WIMS) · Scan QR"
       title="Scan QR"
-      description="Scan your assigned company QR while signed in to record your own attendance."
+      description={
+        isLocationTestAccount
+          ? "In production environments, this account can scan any company QR to test its location without recording attendance."
+          : "Scan your assigned company QR while signed in to record your own attendance."
+      }
     >
       {user?.accessId === 1 ? (
         <>
           <div className="dashboard-section">
             <h2 className="dashboard-section-title">Camera scanner</h2>
             <p className="dashboard-section-sub">
-              First scan records time in; the next scan records time out. A
-              company code that does not match your account or location will be
-              rejected. Allow location access when prompted.
+              {isLocationTestAccount
+                ? "The location must be within the scanned company's check-in radius. This test does not record attendance. Allow location access when prompted."
+                : "First scan records time in; the next scan records time out. A company code that does not match your account or location will be rejected. Allow location access when prompted."}
             </p>
             <div className="dashboard-inline-actions">
               <SimpleButton

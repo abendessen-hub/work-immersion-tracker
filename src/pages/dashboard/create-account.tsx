@@ -3,6 +3,11 @@ import DashboardLayout from "./layout";
 import Form from "../../components/form";
 import SimpleButton from "../../components/simple-button";
 
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+
 type AccountForm = {
   fullName: string;
   username: string;
@@ -39,8 +44,25 @@ export default function CreateAccountPage() {
     accessReferences: [],
   });
   const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isError, setIsError] = useState(false);
   const [busy, setBusy] = useState(false);
+  const selectedAccess = references.accessReferences.find(
+    (access) => String(access.access_id) === values.accessId,
+  );
+  const isAdminOrDeployer = ["admin", "deployer"].includes(
+    selectedAccess?.access_name.toLowerCase() ?? "",
+  );
+
+  const handleClickShowPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+  };
 
   useEffect(() => {
     fetch("/api/reference-data")
@@ -128,14 +150,14 @@ export default function CreateAccountPage() {
           onChange={handleChange("username")}
         />
         <label className="form-field" htmlFor="account-section">
-          Section
+          Section{isAdminOrDeployer ? " (optional)" : ""}
           <select
             id="account-section"
             value={values.section}
             onChange={(event) =>
               setValues((prev) => ({ ...prev, section: event.target.value }))
             }
-            required
+            required={!isAdminOrDeployer}
           >
             <option value="">Select section</option>
             {references.sections.map((section) => (
@@ -146,14 +168,14 @@ export default function CreateAccountPage() {
           </select>
         </label>
         <label className="form-field" htmlFor="account-company">
-          Company
+          Company{isAdminOrDeployer ? " (optional)" : ""}
           <select
             id="account-company"
             value={values.company}
             onChange={(event) =>
               setValues((prev) => ({ ...prev, company: event.target.value }))
             }
-            required
+            required={!isAdminOrDeployer}
           >
             <option value="">Select company</option>
             {references.companies.map((company) => (
@@ -185,11 +207,25 @@ export default function CreateAccountPage() {
           label="Password"
           id="teacher-password"
           autoFocus={false}
-          type="password"
+          type={showPassword ? "text" : "password"}
           autoComplete="new-password"
           placeholder="Temporary password"
           value={values.password}
           onChange={handleChange("password")}
+          endAdornment={
+            <InputAdornment position="end">
+              <IconButton
+                name="password"
+                type="button"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
+                onClick={handleClickShowPassword}
+                onMouseDown={handleMouseDownPassword}
+              >
+                {showPassword ? <Visibility /> : <VisibilityOff />}
+              </IconButton>
+            </InputAdornment>
+          }
         />
         <label className="form-field" htmlFor="account-changed-password">
           Changed Password
