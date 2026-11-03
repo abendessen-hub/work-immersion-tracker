@@ -241,12 +241,12 @@ export default function CreateAccountPage() {
             required
           >
             <option value="">Select status</option>
-            <option key={"true"} value={"true"}>
-              {"true"}
+            <option key={"Yes"} value={"true"}>
+              Yes
             </option>
 
-            <option key={"false"} value={"false"}>
-              {"false"}
+            <option key={"No"} value={"false"}>
+              No
             </option>
           </select>
         </label>

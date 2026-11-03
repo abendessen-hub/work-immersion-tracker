@@ -10,8 +10,7 @@ type Company = {
   company_id: number;
   company_name: string;
   latitude: number | string | null;
-  longitude: number | string | null;
-  radius_meters: number;
+  longitude: number | string | null
 };
 
 type AccessReference = {
@@ -35,8 +34,7 @@ type ReferencesResponse = {
 type CompanyValues = {
   companyName: string;
   latitude: string;
-  longitude: string;
-  radiusMeters: string;
+  longitude: string
 };
 
 type SectionValues = {
@@ -46,8 +44,7 @@ type SectionValues = {
 const emptyCompany: CompanyValues = {
   companyName: "",
   latitude: "",
-  longitude: "",
-  radiusMeters: "20",
+  longitude: ""
 };
 
 const emptySection: SectionValues = { sectionName: "" };
@@ -164,8 +161,7 @@ function ManageReferences() {
           ...(editingCompanyId === null ? {} : { companyId: editingCompanyId }),
           companyName: companyValues.companyName,
           latitude: Number(companyValues.latitude),
-          longitude: Number(companyValues.longitude),
-          radiusMeters: Number(companyValues.radiusMeters),
+          longitude: Number(companyValues.longitude)
         },
       );
       setCompanies((current) =>
@@ -199,8 +195,7 @@ function ManageReferences() {
     setCompanyValues({
       companyName: company.company_name,
       latitude: company.latitude == null ? "" : String(company.latitude),
-      longitude: company.longitude == null ? "" : String(company.longitude),
-      radiusMeters: String(company.radius_meters),
+      longitude: company.longitude == null ? "" : String(company.longitude)
     });
     setMessage("");
   };
@@ -398,24 +393,6 @@ function ManageReferences() {
                     required
                   />
                 </label>
-                <label className="form-field" htmlFor="reference-radius">
-                  Allowed radius (meters)
-                  <input
-                    id="reference-radius"
-                    type="number"
-                    min="1"
-                    max="50000"
-                    step="1"
-                    value={companyValues.radiusMeters}
-                    onChange={(event) =>
-                      setCompanyValues({
-                        ...companyValues,
-                        radiusMeters: event.target.value,
-                      })
-                    }
-                    required
-                  />
-                </label>
                 <label className="form-field" htmlFor="reference-latitude">
                   Latitude
                   <input
@@ -507,7 +484,6 @@ function ManageReferences() {
                       {company.latitude == null || company.longitude == null
                         ? "Location not configured"
                         : `${Number(company.latitude).toFixed(6)}, ${Number(company.longitude).toFixed(6)}`}
-                      {` · ${company.radius_meters} m radius`}
                     </p>
                   </div>
                   <div className="dashboard-inline-actions">

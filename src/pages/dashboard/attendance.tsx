@@ -328,7 +328,7 @@ function AttendancePage() {
                 <th scope="col">Date</th>
                 <th scope="col">Time in</th>
                 <th scope="col">Time out</th>
-                {!isStudent ? <th scope="col">Distance</th> : null}
+                {!isStudent ? <th scope="col">{"Distance(m)"}</th> : null}
               </tr>
             </thead>
             <tbody>
@@ -349,7 +349,7 @@ function AttendancePage() {
                   <td>
                     {record.time_out ? formatTo12Hour(record.time_out) : "—"}
                   </td>
-                  {!isStudent ? <td>{record.distance}</td> : null}
+                  {!isStudent ? <td>{`${record.distance}m`}</td> : null}
                 </tr>
               ))}
             </tbody>
