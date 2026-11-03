@@ -998,3 +998,116 @@
     transform: none;
   }
 }
+
+
+/* ---- QR Preview Card & Print styles ---- */
+
+.qr-preview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  width: min(100%, 380px);
+  padding: 24px 20px;
+  border: 1px solid #d5e3fb;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(20, 56, 120, 0.04);
+  box-sizing: border-box;
+}
+
+.qr-preview-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.qr-preview-badge {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  background: #edf4ff;
+  border: 1px solid #cfe0ff;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.qr-preview-company {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.qr-preview-date {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.qr-preview-card .qr-preview {
+  width: 100%;
+  max-width: 300px;
+  padding: 8px;
+  border: 1px solid #e1ecfa;
+  border-radius: 14px;
+}
+
+.qr-preview-instructions {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-muted);
+}
+
+@media print {
+  body {
+    background: #ffffff !important;
+  }
+
+  .site-header,
+  .site-footer,
+  .dashboard-header,
+  .dashboard-divider,
+  .dashboard-section,
+  .dashboard-form > .form-field,
+  .dashboard-inline-actions,
+  .dashboard-message {
+    display: none !important;
+  }
+
+  .dashboard-card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  .qr-preview-card {
+    margin: 40px auto !important;
+    border: 3px solid #1456ce !important;
+    border-radius: 24px !important;
+    padding: 40px 32px !important;
+    box-shadow: none !important;
+    width: 480px !important;
+    max-width: 100% !important;
+  }
+
+  .qr-preview-company {
+    font-size: 28px !important;
+  }
+
+  .qr-preview-card .qr-preview {
+    width: 320px !important;
+    max-width: 320px !important;
+  }
+}
