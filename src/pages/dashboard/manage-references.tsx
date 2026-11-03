@@ -655,7 +655,7 @@ function ManageReferences() {
             </div>
           </section>
 
-          <section className="dashboard-section reference-panel">
+          {isDeployer ? (<></>) : <section className="dashboard-section reference-panel">
             <h2 className="dashboard-section-title">Access references</h2>
             <p className="dashboard-section-sub">
               Built-in roles with IDs 1–3 are reserved by the app. Additional
@@ -747,7 +747,7 @@ function ManageReferences() {
                 <p className="dashboard-message">No access references yet.</p>
               ) : null}
             </div>
-          </section>
+          </section>}
         </div>
       )}
       {message ? (

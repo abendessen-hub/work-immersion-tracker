@@ -116,8 +116,10 @@ in the workbook match those references without case sensitivity.
 Use **Manage References** as an admin to create or update companies, set each
 company's coordinates (manually or from the current device location), and choose
 its allowed check-in radius. Student QR check-ins require device location access
-and are rejected if the reported location falls outside that radius. Geolocation
-requires HTTPS except on localhost.
+and are rejected if the reported location falls outside that radius plus a
+GPS-accuracy buffer of up to 20 m. The buffer only applies when the device's
+reported accuracy supports the distance beyond the configured radius.
+Geolocation requires HTTPS except on localhost.
 `immersion_teacher` is a separate reference entity; it does not create or grant a
 teacher login. Access role IDs are looked up by name from `access_reference`.
 

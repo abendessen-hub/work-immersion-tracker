@@ -54,7 +54,7 @@ function ScanQrPage() {
     if (result.testOnly === true) {
       setIsError(false);
       setMessage(
-        `Location check passed for ${result.companyName} (${result.distanceMeters} m away; ${result.radiusMeters} m allowed). Attendance was not recorded.`,
+        `Location check passed for ${result.companyName} (${result.distanceMeters} m away; ${result.allowedDistanceMeters} m allowed for this GPS fix, including the ${result.radiusMeters} m company radius). Attendance was not recorded.`,
       );
       return;
     }
