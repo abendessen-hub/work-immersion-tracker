@@ -588,7 +588,7 @@
 }
 
 .qr-preview {
-  width: min(100%, 360px);
+  width: min(100%, 480px);
   padding: 12px;
   border: 1px solid #d5e3fb;
   border-radius: 18px;
@@ -1002,14 +1002,18 @@
 
 /* ---- QR Preview Card & Print styles ---- */
 
+.dashboard-form--wide {
+  max-width: 560px;
+}
+
 .qr-preview-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 12px;
-  width: min(100%, 380px);
-  padding: 24px 20px;
+  gap: 16px;
+  width: min(100%, 520px);
+  padding: 28px 24px;
   border: 1px solid #d5e3fb;
   border-radius: 20px;
   background: #ffffff;
@@ -1021,7 +1025,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   width: 100%;
 }
 
@@ -1033,13 +1037,13 @@
   color: var(--color-primary);
   background: #edf4ff;
   border: 1px solid #cfe0ff;
-  padding: 3px 10px;
+  padding: 4px 12px;
   border-radius: 999px;
 }
 
 .qr-preview-company {
   margin: 0;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
   color: var(--color-text);
   letter-spacing: -0.02em;
@@ -1049,23 +1053,23 @@
 
 .qr-preview-date {
   margin: 0;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--color-muted);
 }
 
 .qr-preview-card .qr-preview {
   width: 100%;
-  max-width: 300px;
-  padding: 8px;
+  max-width: 440px;
+  padding: 12px;
   border: 1px solid #e1ecfa;
-  border-radius: 14px;
+  border-radius: 16px;
 }
 
 .qr-preview-instructions {
   margin: 0;
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 13.5px;
+  line-height: 1.5;
   color: var(--color-muted);
 }
 
@@ -1093,21 +1097,21 @@
   }
 
   .qr-preview-card {
-    margin: 40px auto !important;
+    margin: 30px auto !important;
     border: 3px solid #1456ce !important;
     border-radius: 24px !important;
-    padding: 40px 32px !important;
+    padding: 44px 36px !important;
     box-shadow: none !important;
-    width: 480px !important;
+    width: 640px !important;
     max-width: 100% !important;
   }
 
   .qr-preview-company {
-    font-size: 28px !important;
+    font-size: 36px !important;
   }
 
   .qr-preview-card .qr-preview {
-    width: 320px !important;
-    max-width: 320px !important;
+    width: 480px !important;
+    max-width: 480px !important;
   }
 }
