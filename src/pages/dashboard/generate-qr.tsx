@@ -101,7 +101,7 @@ function GenerateQrPage() {
         await QRCode.toDataURL(payload, {
           errorCorrectionLevel: "M",
           margin: 2,
-          width: 360,
+          width: 600,
         }),
       );
       setIsError(false);
@@ -201,8 +201,8 @@ function GenerateQrPage() {
     }
     .print-card {
       width: 100%;
-      max-width: 540px;
-      padding: 44px 36px;
+      max-width: 680px;
+      padding: 48px 40px;
       border: 3px solid #1456ce;
       border-radius: 24px;
       display: flex;
@@ -224,7 +224,7 @@ function GenerateQrPage() {
       margin-bottom: 20px;
     }
     .company-title {
-      font-size: 32px;
+      font-size: 38px;
       font-weight: 800;
       line-height: 1.25;
       color: #0f2756;
@@ -242,23 +242,24 @@ function GenerateQrPage() {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 18px;
       border: 2px solid #d5e3fb;
       border-radius: 20px;
       background: #ffffff;
       margin-bottom: 24px;
     }
     .qr-container img {
-      width: 320px;
-      height: 320px;
+      width: 500px;
+      height: 500px;
+      max-width: 100%;
       display: block;
       image-rendering: pixelated;
     }
     .instruction {
-      font-size: 14px;
+      font-size: 15px;
       line-height: 1.55;
       color: #2b3e5a;
-      max-width: 440px;
+      max-width: 480px;
     }
     .footer-note {
       margin-top: 26px;
@@ -319,7 +320,7 @@ function GenerateQrPage() {
       }
     >
       {isStudent ? (
-        <div className="dashboard-form">
+        <div className="dashboard-form dashboard-form--wide">
           <div className="dashboard-section">
             <h2 className="dashboard-section-title">
               Temporary attendance QR
@@ -397,7 +398,7 @@ function GenerateQrPage() {
               to record their own time in or time out.
             </p>
           </div>
-          <div className="dashboard-form">
+          <div className="dashboard-form dashboard-form--wide">
             <div className="form-field">
               <label htmlFor="qr-company">Company</label>
               <select
