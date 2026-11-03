@@ -41,7 +41,7 @@ const actions = [
     title: "Generate QR",
     description:
       "Create and download official check-in QR codes for companies.",
-    tag: "Admin/Deployer",
+    tag: "Students/Admin/Deployer",
     accessLevels: [1, 3, 4],
     icon: <QrCode2Icon />,
     to: "/dashboard/generate-qr",

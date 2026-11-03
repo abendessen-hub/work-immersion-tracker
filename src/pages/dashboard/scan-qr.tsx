@@ -150,7 +150,9 @@ function ScanQrPage() {
       description={
         isLocationTestAccount
           ? "In production environments, this account can scan any company QR to test its location without recording attendance."
-          : "Scan your assigned company QR while signed in to record your own attendance."
+          : user?.accessId === 1
+            ? "Scan your assigned company QR while signed in to record your own attendance."
+            : "Scan the given student QR to record their attendance"
       }
     >
       {user?.accessId === 1 ? (
@@ -184,10 +186,21 @@ function ScanQrPage() {
           </div>
         </>
       ) : (
-        <p className="dashboard-message dashboard-message--error" role="status">
-          Work In Progress. Teachers, Admins, and Deployers will have access to
-          scan the QR of students in need of help with Attendance.
-        </p>
+        <>
+          <p
+            className="dashboard-message dashboard-message--error"
+            role="status"
+          >
+            Work In Progress. Teachers, Admins, and Deployers will have access
+            to scan the QR of students in need of help with Attendance.
+          </p>{" "}
+          <p
+            className="dashboard-message dashboard-message--error"
+            role="status"
+          >
+            This feature will be pushed to version 1.2.0
+          </p>
+        </>
       )}
       {message ? (
         <p

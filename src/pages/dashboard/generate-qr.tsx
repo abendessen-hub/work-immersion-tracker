@@ -89,7 +89,11 @@ function GenerateQrPage() {
     <DashboardLayout
       eyebrow="Work Immersion Monitoring System (WIMS) · Generate QR"
       title="Generate QR"
-      description="Generate a unique company check-in QR Code PNG."
+      description={
+        user?.accessId === 1
+          ? "Generate a stueent QR Code for attendance"
+          : "Generate a unique company check-in QR Code PNG."
+      }
     >
       {user?.accessId !== 1 ? (
         <>
@@ -148,10 +152,22 @@ function GenerateQrPage() {
           </div>
         </>
       ) : (
-        <p className="dashboard-message dashboard-message--error" role="status">
-          Work In Progress. Students will be able to generate a temporary QR
-          code for help with higher access levels.
-        </p>
+        <>
+          <p
+            className="dashboard-message dashboard-message--error"
+            role="status"
+          >
+            Work In Progress. Students will be able to generate a QR code for
+            help with higher access levels.
+          </p>
+
+          <p
+            className="dashboard-message dashboard-message--error"
+            role="status"
+          >
+            This feature will be pushed to version 1.2.0
+          </p>
+        </>
       )}
       {message ? (
         <p
