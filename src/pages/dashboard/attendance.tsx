@@ -149,6 +149,7 @@ function AttendancePage() {
       worksheet.addRows(
         pagination.filteredRecords.map((record) => ({
           ...record,
+          distance: `${record.distance}m`,
           time_in: formatTo12Hour(record.time_in),
           time_out: record.time_out ? formatTo12Hour(record.time_out) : "",
           date: record.date ? new Date(record.date).toLocaleDateString() : "—",
