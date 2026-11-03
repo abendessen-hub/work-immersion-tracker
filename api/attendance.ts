@@ -102,7 +102,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     WHEN a.record_id IS NULL THEN ${date}::date
                     ELSE a.date
                   END AS date,
-                  a.time_in, a.time_out, distance
+                  a.time_in, a.time_out, distance,
                   CASE
                       WHEN a.record_id IS NULL THEN 'Absent'
                       WHEN a.time_out IS NULL THEN 'No Time Out'
