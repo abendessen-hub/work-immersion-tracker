@@ -1,8 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { getSession, isPositiveInteger, sql } from "./_lib.js";
 
-const MAX_GPS_UNCERTAINTY_BUFFER_METERS = 20;
-
 function optionalDate(value: unknown): string | null | undefined {
   if (value === undefined || value === null || value === "") return null;
   if (
