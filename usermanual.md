@@ -47,13 +47,13 @@ WIMS implements role-based access control (RBAC) across four standard access lev
 | :--- | :---: | :---: | :---: | :---: |
 | **Sign In & Session Management** | Yes | Yes | Yes | Yes |
 | **Mandatory First-Time Password Reset** | Yes | No | No | No |
-| **Scan QR** (Log Daily Time In / Time Out) | Yes | Yes | Yes | No |
+| **Scan QR** (Log Daily Time In / Time Out) | Yes | Yes | Yes | Yes |
 | **Attendance** (Personal History & Personal Export) | Yes | No | No | No |
 | **Attendance** (Class / School-wide Filters & Excel Export) | No | Yes | Yes | Yes |
 | **Create Student Accounts** (Bulk `.xlsx` Import) | No | Yes | Yes | No |
 | **Manage References — Companies & Sections** | No | No | Yes | Yes |
 | **Manage References — Access References** | No | No | Yes | No |
-| **Generate QR** (Partner Company Check-in PNGs) | No | No | Yes | Yes |
+| **Generate QR** (Temporary Student Attendance / Company Check-in PNGs) | Yes | No | Yes | Yes |
 | **Create Account** (Single Account Creation) | No | No | Yes | No |
 | **Manage Accounts** (User Administration & Directory) | No | No | Yes | No |
 
@@ -79,7 +79,8 @@ WIMS implements role-based access control (RBAC) across four standard access lev
 2. **Mandatory Password Reset:** Immediately enter and confirm a personal password with at least 6 characters.
 3. **Morning Time In:** Upon arriving at your partner immersion company, open **Scan QR**, tap **Start Camera**, and scan the company's official WIMS QR poster.
 4. **Afternoon Time Out:** At the conclusion of your shift, scan the same QR code to record your departure timestamp.
-5. **Verify Your Hours:** Check the **Attendance** module anytime to track your total logged immersion hours and view your attendance records.
+5. **Record a Missed Day:** In **Generate QR**, choose the missed date, generate and download the temporary attendance PNG, then send it to your teacher. A teacher in your section, admin, or deployer can scan the QR from the image or upload the PNG to record it.
+6. **Verify Your Hours:** Check the **Attendance** module anytime to track your total logged immersion hours and view your attendance records.
 
 ---
 
@@ -112,21 +113,21 @@ The WIMS dashboard adopts a clean, professional, and minimalist aesthetic:
 * **Session Termination:** Click the **Log Out** button at any time to invalidate your active session.
 
 ### 5.2 Scan QR (Student Attendance Logging)
-* **Access Level:** Students (Level 1), Teachers (Level 2), Admins (Level 3)
-* **Objective:** Records physical arrival (**Time In**) and departure (**Time Out**) at the immersion establishment.
+* **Access Level:** Students (Level 1), Teachers (Level 2), Admins (Level 3), Deployers (Level 4)
+* **Objective:** Students record normal company check-ins; staff record missed student attendance from a temporary QR.
 
 **Operational Steps:**
 1. From the dashboard, select **Scan QR**.
-2. Tap **Start Camera** and grant your web browser camera permissions if prompted.
-3. Point your camera at the official WIMS QR code displayed at your immersion workplace.
-4. Upon recognition, the scanner provides immediate visual feedback:
-   * **First Scan of the Day:** Records **Time In** timestamp and confirms with a clear success message.
-   * **Second Scan of the Day:** Records **Time Out** timestamp and confirms shift completion.
+2. Students tap **Start Camera**, grant browser camera permission, and scan their assigned company's official WIMS QR code.
+3. Staff may scan a temporary student attendance QR with **Start Camera**, or upload the PNG the student sent.
+4. A temporary attendance record is saved for the date in the QR with **11:00 AM** time in, **1:00 PM** time out, and **20 meters** distance.
 
 **Validation Protocols:**
 * **Company Locking:** Each student is registered to a specific immersion company. Scanning a QR code belonging to a different company is blocked with a validation alert.
 * **Two-Scan Daily Limit:** Each student is restricted to one arrival and one departure timestamp per calendar day (`Asia/Manila`).
 * **Geofence Proximity:** If GPS verification is active for the company, the device's location must fall within the configured perimeter radius.
+* **Section Access:** Teachers can record temporary attendance only for students in their assigned section. Admins and deployers may record for any student.
+* **Temporary QR safeguards:** The QR is signed by WIMS, cannot be edited to change its student/date, and cannot create a duplicate record for the same student and date.
 
 ### 5.3 Attendance Monitoring & Excel Reports
 * **Access Level:** All Roles (Interface adapts automatically to role permissions)
@@ -190,8 +191,15 @@ The WIMS dashboard adopts a clean, professional, and minimalist aesthetic:
 * Allows creation of custom system role labels when expanding integration scopes.
 
 ### 5.6 Generate QR (Partner Company Setup)
-* **Access Level:** Admins (Level 3) and Deployers (Level 4)
-* **Objective:** Produce crisp, printable QR code markers for each deployment location.
+* **Access Level:** Students (Level 1), Admins (Level 3), and Deployers (Level 4)
+* **Objective:** Students generate temporary attendance QR PNGs; admins and deployers generate company check-in QR codes.
+#### Student temporary attendance QR
+1. Select **Generate QR** from the dashboard.
+2. Choose the missed attendance date. Dates in the future and dates with an existing attendance record are rejected.
+3. Click **Generate Temporary QR**, then **Download PNG**.
+4. Send the downloaded image to your teacher using a communication app. Your teacher can upload that image in **Scan QR**. Admins and deployers can also record it.
+
+#### Company check-in QR for admins and deployers
 1. Select **Generate QR** from the dashboard.
 2. Choose the partner company from the dropdown menu.
 3. Click **Generate QR Code** to view the preview.

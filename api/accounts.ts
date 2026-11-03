@@ -193,8 +193,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const accessId = positiveId(body.accessId);
     const sectionId = nullableId(body.sectionId);
     const companyId = nullableId(body.companyId);
-    const changedPassword =
-      typeof body.changedPassword === "boolean" ? body.changedPassword : null;
     const password = typeof body.password === "string" ? body.password : "";
 
     if (
@@ -203,7 +201,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       !username ||
       !contactNumber ||
       !accessId ||
-      changedPassword === null ||
       sectionId === undefined ||
       companyId === undefined
     ) {

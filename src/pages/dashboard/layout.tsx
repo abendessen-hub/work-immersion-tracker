@@ -16,6 +16,7 @@ const roleLabelById: Record<number, string> = {
   1: "Student",
   2: "Teacher",
   3: "Admin",
+  4: "Deployer",
 };
 
 function DashboardLayout({

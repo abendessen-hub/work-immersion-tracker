@@ -13,11 +13,12 @@ import BadgeIcon from "@mui/icons-material/Badge";
 const actions = [
   {
     title: "Scan QR",
-    description: "Record daily trainee time-in and time-out via camera.",
+    description:
+      "Students check in; staff scan or upload temporary student attendance QR codes.",
     tag: "All roles",
     to: "/dashboard/scan-qr",
     icon: <QrCodeScannerIcon />,
-    accessLevels: [1, 2, 3],
+    accessLevels: [1, 2, 3, 4],
     active: true,
   },
   {
@@ -40,7 +41,7 @@ const actions = [
   {
     title: "Generate QR",
     description:
-      "Create and download official check-in QR codes for companies.",
+      "Students create temporary attendance QR codes; admins and deployers create company QR codes.",
     tag: "Students/Admin/Deployer",
     accessLevels: [1, 3, 4],
     icon: <QrCode2Icon />,

@@ -102,6 +102,7 @@ Before using spreadsheet account creation, QR check-in, or attendance reports, r
 [`database/migrations/001_accounts_attendance.sql`](./database/migrations/001_accounts_attendance.sql)
 and [`database/migrations/002_company_geofence.sql`](./database/migrations/002_company_geofence.sql)
 and [`database/migrations/003_unlink_sections_company.sql`](./database/migrations/003_unlink_sections_company.sql)
+and [`database/migrations/004_add_invisible_distance.sql`](./database/migrations/004_add_invisible_distance.sql)
 against the Neon database configured by `DATABASE_URL`. The first migration creates the reference
 tables `access_reference`, `company_reference`, `immersion_teacher`, and
 `section_reference`, along with `users` and `attendance_record` matching the
@@ -133,7 +134,11 @@ distribute it securely.
 Keep LRN and contact-number cells formatted as text to preserve leading zeros.
 Company QR codes record time in on first scan and time out on the next scan for
 the signed-in student. Attendance access is restricted server-side to the
-student's own rows; teacher/admin reports can filter by date, section, and company.
+student's own rows during normal check-in. Students can also generate a signed
+temporary QR for an unrecorded date; teachers can record it only for students
+in their section, while admins and deployers can record it for any student.
+Temporary records use 11:00 AM time in, 1:00 PM time out, and 20 meters.
+Teacher/admin/deployer reports can filter by date, section, and company.
 
 ## Useful scripts
 

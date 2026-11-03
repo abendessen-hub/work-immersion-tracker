@@ -1,4 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
+import IconButton from "@mui/material/IconButton";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useAuth } from "../../context/useAuth";
 import DashboardLayout from "./layout";
 import SimpleButton from "../../components/simple-button";
@@ -62,6 +65,7 @@ function ManageAccounts() {
   const [refresh, setRefresh] = useState(0);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [values, setValues] = useState<AccountValues>(emptyValues);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
 
@@ -123,6 +127,7 @@ function ManageAccounts() {
 
   const editAccount = (account: Account) => {
     setEditingId(account.user_id);
+    setShowResetPassword(false);
     setValues({
       username: account.username,
       fullName: account.full_name,
@@ -161,6 +166,7 @@ function ManageAccounts() {
         throw new Error(result.error ?? "Account could not be updated.");
       setEditingId(null);
       setValues(emptyValues);
+      setShowResetPassword(false);
       setIsError(false);
       setMessage(`Account "${result.user.username}" updated.`);
       setRefresh((value) => value + 1);
@@ -390,16 +396,31 @@ function ManageAccounts() {
                 </label>
                 <label className="form-field" htmlFor="account-password">
                   Reset password (leave blank to keep current password)
-                  <input
-                    id="account-password"
-                    type="password"
-                    autoComplete="new-password"
-                    minLength={6}
-                    value={values.password}
-                    onChange={(event) =>
-                      setValues({ ...values, password: event.target.value })
-                    }
-                  />
+                  <span className="account-password-control">
+                    <input
+                      id="account-password"
+                      type={showResetPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      minLength={6}
+                      value={values.password}
+                      onChange={(event) =>
+                        setValues({ ...values, password: event.target.value })
+                      }
+                    />
+                    <IconButton
+                      className="account-password-toggle"
+                      type="button"
+                      aria-label={
+                        showResetPassword ? "Hide password" : "Show password"
+                      }
+                      aria-pressed={showResetPassword}
+                      onClick={() =>
+                        setShowResetPassword((visible) => !visible)
+                      }
+                    >
+                      {showResetPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </span>
                 </label>
                 <div className="dashboard-inline-actions">
                   <SimpleButton type="submit" disabled={busy}>
@@ -412,6 +433,7 @@ function ManageAccounts() {
                     onClick={() => {
                       setEditingId(null);
                       setValues(emptyValues);
+                      setShowResetPassword(false);
                     }}
                   >
                     Cancel

@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import jwt from "jsonwebtoken";
 import { getSession, isPositiveInteger, sql } from "./_lib.js";
 
 function optionalDate(value: unknown): string | null | undefined {
@@ -140,6 +141,159 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+
+  if (req.body?.action === "generate-temporary") {
+    if (session.accessId !== 1) {
+      return res.status(403).json({ error: "Only students can generate this QR code" });
+    }
+    const date = optionalDate(req.body?.date);
+    if (!date) {
+      return res.status(400).json({ error: "Choose a valid attendance date" });
+    }
+
+    try {
+      const users = await sql`
+        SELECT user_id, access_id, section_id
+        FROM users
+        WHERE user_id = ${session.userId}
+        LIMIT 1
+      `;
+      const student = users[0];
+      if (!student || Number(student.access_id) !== 1) {
+        return res.status(403).json({ error: "Student account is no longer active" });
+      }
+      if (student.section_id == null) {
+        return res.status(400).json({
+          error: "Your account needs an assigned section before generating an attendance QR",
+        });
+      }
+
+      const [futureDates, existing] = await Promise.all([
+        sql`
+          SELECT ${date}::date >
+            (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Manila')::date AS is_future
+        `,
+        sql`
+          SELECT record_id FROM attendance_record
+          WHERE user_id = ${student.user_id} AND date = ${date}::date
+          LIMIT 1
+        `,
+      ]);
+      if (futureDates[0]?.is_future) {
+        return res.status(400).json({ error: "The attendance date cannot be in the future" });
+      }
+      if (existing.length) {
+        return res.status(409).json({
+          error: "Attendance is already recorded for that date",
+        });
+      }
+
+      const token = jwt.sign(
+        {
+          purpose: "temporary-attendance",
+          userId: Number(student.user_id),
+          date,
+        },
+        process.env.JWT_SECRET!,
+      );
+      return res.status(200).json({ token, date });
+    } catch (error) {
+      console.error("Temporary attendance QR generation failed:", error);
+      return res.status(500).json({ error: "Temporary attendance QR could not be generated" });
+    }
+  }
+
+  if (req.body?.action === "record-temporary") {
+    if (![2, 3, 4].includes(session.accessId)) {
+      return res.status(403).json({ error: "Staff access is required to record this attendance" });
+    }
+    const token = req.body?.token;
+    if (typeof token !== "string" || !token) {
+      return res.status(400).json({ error: "Temporary attendance QR code is invalid" });
+    }
+
+    try {
+      const claims = jwt.verify(token, process.env.JWT_SECRET!);
+      if (
+        typeof claims === "string" ||
+        claims.purpose !== "temporary-attendance" ||
+        !isPositiveInteger(Number(claims.userId))
+      ) {
+        return res.status(400).json({ error: "Temporary attendance QR code is invalid" });
+      }
+      const studentId = Number(claims.userId);
+      const date = optionalDate(claims.date);
+      if (!date) {
+        return res.status(400).json({ error: "Temporary attendance QR code is invalid" });
+      }
+
+      const [actors, students] = await Promise.all([
+        sql`
+          SELECT access_id, section_id FROM users
+          WHERE user_id = ${session.userId}
+          LIMIT 1
+        `,
+        sql`
+          SELECT user_id, full_name, section_id FROM users
+          WHERE user_id = ${studentId} AND access_id = 1
+          LIMIT 1
+        `,
+      ]);
+      const actor = actors[0];
+      const student = students[0];
+      if (!actor || ![2, 3, 4].includes(Number(actor.access_id))) {
+        return res.status(403).json({ error: "Staff account is no longer active" });
+      }
+      if (!student) {
+        return res.status(404).json({ error: "Student account was not found" });
+      }
+      if (
+        Number(actor.access_id) === 2 &&
+        (actor.section_id == null ||
+          student.section_id == null ||
+          Number(actor.section_id) !== Number(student.section_id))
+      ) {
+        return res.status(403).json({
+          error: "Teachers can only record attendance for students in their section",
+        });
+      }
+
+      const [, records] = await sql.transaction([
+        sql`
+          SELECT pg_advisory_xact_lock(
+            hashtext(${String(studentId)}), hashtext(${date})
+          )
+        `,
+        sql`
+          INSERT INTO attendance_record
+            (user_id, date, time_in, time_out, distance)
+          SELECT ${studentId}, ${date}::date, TIME '11:00', TIME '13:00', 20
+          WHERE NOT EXISTS (
+            SELECT 1 FROM attendance_record
+            WHERE user_id = ${studentId} AND date = ${date}::date
+          )
+          RETURNING record_id, date, time_in, time_out, distance
+        `,
+      ]);
+      if (!records.length) {
+        return res.status(409).json({
+          error: "Attendance is already recorded for that date",
+        });
+      }
+      return res.status(201).json({
+        action: "temporary",
+        studentName: student.full_name,
+        record: records[0],
+      });
+    } catch (error) {
+      if (error instanceof jwt.JsonWebTokenError) {
+        return res.status(400).json({ error: "Temporary attendance QR code is invalid" });
+      }
+      console.error("Temporary attendance recording failed:", error);
+      return res.status(500).json({ error: "Attendance could not be recorded" });
+    }
+  }
+
   if (session.accessId !== 1) {
     return res
       .status(403)

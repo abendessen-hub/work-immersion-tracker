@@ -194,6 +194,22 @@
   line-height: 1.55;
 }
 
+.account-password-control {
+  position: relative;
+  display: block;
+}
+
+.account-password-control input {
+  padding-right: 52px;
+}
+
+.account-password-toggle.MuiIconButton-root {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+}
+
 /* ---- action card grid (home) ---- */
 
 .dashboard-actions {
