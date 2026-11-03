@@ -228,8 +228,8 @@ The WIMS dashboard adopts a clean, professional, and minimalist aesthetic:
 1. Select **Generate QR** from the dashboard.
 2. Choose the partner company from the dropdown menu.
 3. Click **Generate QR Code** to view the preview.
-4. Click **Download PNG** to save the graphic.
-5. Print or frame the QR code image for display at the partner company's reception or check-in desk.
+4. Click **Download PNG** to save the graphic, or click **Print QR** to directly print a check-in poster displaying the company name and QR code.
+5. Display the printed QR code poster at the partner company's reception or check-in desk.
 
 ### 5.7 Create Account (General User Provisioning)
 

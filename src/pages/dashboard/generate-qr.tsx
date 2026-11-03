@@ -5,6 +5,15 @@ import SimpleButton from "../../components/simple-button";
 
 type Company = { company_id: number; company_name: string };
 
+function escapeHtml(text: string) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 function todayInManila() {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Manila",
@@ -133,6 +142,172 @@ function GenerateQrPage() {
     link.click();
   };
 
+  const handlePrint = () => {
+    if (!qrDataUrl) return;
+
+    const companyName = selectedCompany?.company_name ?? "";
+    const title =
+      companyName ||
+      (isStudent ? `Temporary Attendance (${attendanceDate})` : "Attendance QR Code");
+    const subTitle = selectedCompany
+      ? "Work Immersion Partner Company Check-in"
+      : isStudent
+        ? `Student: ${user?.fullname || "Student"}`
+        : "Work Immersion Attendance";
+    const instruction = selectedCompany
+      ? "Scan using the WIMS App on your device to record daily Time In and Time Out."
+      : "Send or present this QR code to your section teacher or school administrator to record missed attendance.";
+
+    const printFrame = document.createElement("iframe");
+    printFrame.style.position = "fixed";
+    printFrame.style.right = "0";
+    printFrame.style.bottom = "0";
+    printFrame.style.width = "0";
+    printFrame.style.height = "0";
+    printFrame.style.border = "0";
+    document.body.appendChild(printFrame);
+
+    const doc = printFrame.contentWindow?.document;
+    if (!doc) return;
+
+    doc.open();
+    doc.write(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>${escapeHtml(title)} - QR Code</title>
+  <style>
+    @page {
+      size: auto;
+      margin: 15mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #0f2756;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+      text-align: center;
+    }
+    .print-card {
+      width: 100%;
+      max-width: 540px;
+      padding: 44px 36px;
+      border: 3px solid #1456ce;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: none;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #1456ce;
+      background: #edf4ff;
+      border: 1px solid #cfe0ff;
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+    }
+    .company-title {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.25;
+      color: #0f2756;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+      word-break: break-word;
+    }
+    .subtitle {
+      font-size: 15px;
+      font-weight: 600;
+      color: #536b8a;
+      margin-bottom: 28px;
+    }
+    .qr-container {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      border: 2px solid #d5e3fb;
+      border-radius: 20px;
+      background: #ffffff;
+      margin-bottom: 24px;
+    }
+    .qr-container img {
+      width: 320px;
+      height: 320px;
+      display: block;
+      image-rendering: pixelated;
+    }
+    .instruction {
+      font-size: 14px;
+      line-height: 1.55;
+      color: #2b3e5a;
+      max-width: 440px;
+    }
+    .footer-note {
+      margin-top: 26px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #8fa0ba;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="print-card">
+    <div class="badge">Work Immersion Monitoring System</div>
+    <h1 class="company-title">${escapeHtml(companyName || title)}</h1>
+    <p class="subtitle">${escapeHtml(subTitle)}</p>
+    <div class="qr-container">
+      <img src="${qrDataUrl}" alt="${escapeHtml(title)} QR Code" />
+    </div>
+    <p class="instruction">${escapeHtml(instruction)}</p>
+    <div class="footer-note">Official Immersion Attendance Check-in Point</div>
+  </div>
+</body>
+</html>
+    `);
+    doc.close();
+
+    const frameWindow = printFrame.contentWindow;
+    if (!frameWindow) return;
+
+    const firePrint = () => {
+      frameWindow.focus();
+      frameWindow.print();
+      setTimeout(() => {
+        if (printFrame.parentNode) {
+          printFrame.parentNode.removeChild(printFrame);
+        }
+      }, 1500);
+    };
+
+    const qrImg = frameWindow.document.querySelector("img");
+    if (qrImg && !qrImg.complete) {
+      qrImg.onload = () => setTimeout(firePrint, 100);
+      qrImg.onerror = () => firePrint();
+    } else {
+      setTimeout(firePrint, 250);
+    }
+  };
+
   return (
     <DashboardLayout
       eyebrow="Work Immersion Monitoring System (WIMS) · Generate QR"
@@ -186,13 +361,31 @@ function GenerateQrPage() {
             >
               Download PNG
             </SimpleButton>
+            <SimpleButton
+              type="button"
+              variant="secondary"
+              onClick={handlePrint}
+              disabled={!qrDataUrl}
+            >
+              Print QR
+            </SimpleButton>
           </div>
           {qrDataUrl ? (
-            <img
-              className="qr-preview"
-              src={qrDataUrl}
-              alt={`Temporary attendance QR code for ${attendanceDate}`}
-            />
+            <div className="qr-preview-card" id="printable-qr-card">
+              <div className="qr-preview-header">
+                <span className="qr-preview-badge">Temporary Attendance</span>
+                <h3 className="qr-preview-company">{user?.fullname || "Student"}</h3>
+                <p className="qr-preview-date">{attendanceDate}</p>
+              </div>
+              <img
+                className="qr-preview"
+                src={qrDataUrl}
+                alt={`Temporary attendance QR code for ${attendanceDate}`}
+              />
+              <p className="qr-preview-instructions">
+                Present or send to your teacher to record missed attendance
+              </p>
+            </div>
           ) : null}
         </div>
       ) : canGenerateCompanyQr ? (
@@ -241,13 +434,30 @@ function GenerateQrPage() {
               >
                 Download PNG
               </SimpleButton>
+              <SimpleButton
+                type="button"
+                variant="secondary"
+                onClick={handlePrint}
+                disabled={!qrDataUrl}
+              >
+                Print QR
+              </SimpleButton>
             </div>
             {qrDataUrl ? (
-              <img
-                className="qr-preview"
-                src={qrDataUrl}
-                alt={`Company check-in QR code for ${selectedCompany?.company_name ?? "selected company"}`}
-              />
+              <div className="qr-preview-card" id="printable-qr-card">
+                <div className="qr-preview-header">
+                  <span className="qr-preview-badge">Work Immersion Check-in</span>
+                  <h3 className="qr-preview-company">{selectedCompany?.company_name}</h3>
+                </div>
+                <img
+                  className="qr-preview"
+                  src={qrDataUrl}
+                  alt={`Company check-in QR code for ${selectedCompany?.company_name ?? "selected company"}`}
+                />
+                <p className="qr-preview-instructions">
+                  Scan with the WIMS App to record Time In and Time Out
+                </p>
+              </div>
             ) : null}
           </div>
         </>
