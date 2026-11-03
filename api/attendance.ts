@@ -104,7 +104,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     WHEN a.record_id IS NULL THEN ${date}::date
                     ELSE a.date
                   END AS date,
-                  a.time_in, a.time_out,
+                  a.time_in, a.time_out, distance
                   CASE
                       WHEN a.record_id IS NULL THEN 'Absent'
                       WHEN a.time_out IS NULL THEN 'No Time Out'
@@ -190,7 +190,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const companies = await sql`
-      SELECT company_id, company_name, latitude, longitude, radius_meters
+      SELECT company_id, company_name, latitude, longitude
       FROM company_reference
       WHERE company_id = ${locationTestMode ? companyId : user.company_id}
       LIMIT 1
@@ -202,14 +202,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const latitude = Number(company.latitude);
     const longitude = Number(company.longitude);
-    const radiusMeters = Number(company.radius_meters);
     if (
       company.latitude == null ||
       company.longitude == null ||
       !validCoordinate(latitude, -90, 90) ||
-      !validCoordinate(longitude, -180, 180) ||
-      !Number.isFinite(radiusMeters) ||
-      radiusMeters <= 0
+      !validCoordinate(longitude, -180, 180)
     ) {
       return res.status(409).json({
         error:
@@ -223,25 +220,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       latitude,
       longitude,
     );
-    const accuracyBufferMeters = Math.min(
-      location.accuracy,
-      MAX_GPS_UNCERTAINTY_BUFFER_METERS,
-    );
-    const allowedDistanceMeters = radiusMeters + accuracyBufferMeters;
-    if (distance > allowedDistanceMeters) {
-      return res.status(403).json({
-        error: `You are outside your company check-in area (${Math.ceil(distance)} m away; check-in limit for this GPS fix is ${Math.ceil(allowedDistanceMeters)} m).`,
-      });
-    }
 
     if (locationTestMode) {
       return res.status(200).json({
         testOnly: true,
         companyName: company.company_name,
         distanceMeters: Math.ceil(distance),
-        radiusMeters,
-        allowedDistanceMeters: Math.ceil(allowedDistanceMeters),
-        locationPassed: true,
         attendanceRecorded: false,
       });
     }
@@ -270,11 +254,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           FOR UPDATE
         ),
         inserted AS (
-          INSERT INTO attendance_record (user_id, date, time_in)
+          INSERT INTO attendance_record (user_id, date, time_in, distance)
           SELECT
             ${user.user_id},
             (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Manila')::date,
-            (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Manila')::time
+            (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Manila')::time,
+            ${Math.ceil(distance)}
           WHERE NOT EXISTS (SELECT 1 FROM existing)
           RETURNING record_id, date, time_in, time_out
         ),

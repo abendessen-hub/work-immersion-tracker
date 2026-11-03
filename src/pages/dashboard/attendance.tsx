@@ -14,6 +14,7 @@ type AttendanceRecord = {
   date: string | null;
   time_in: string | null;
   time_out: string | null;
+  distance: number;
   status?: "Attended" | "Absent" | "No Time Out";
 };
 
@@ -142,6 +143,7 @@ function AttendancePage() {
         { header: "Date", key: "date", width: 14 },
         { header: "Time In", key: "time_in", width: 14 },
         { header: "Time Out", key: "time_out", width: 14 },
+        { header: "Distance", key: "distance", width: 14 },
         { header: "Status", key: "status", width: 20 },
       ];
       worksheet.addRows(
@@ -311,9 +313,7 @@ function AttendancePage() {
         />
       ) : null}
       {!busy && records.length > 0 && pagination.resultCount === 0 ? (
-        <p className="dashboard-section-sub">
-          No records match your search.
-        </p>
+        <p className="dashboard-section-sub">No records match your search.</p>
       ) : null}
       {pagination.pageRecords.length ? (
         <div className="attendance-table-wrap">
@@ -327,6 +327,7 @@ function AttendancePage() {
                 <th scope="col">Date</th>
                 <th scope="col">Time in</th>
                 <th scope="col">Time out</th>
+                <th scope="col">Distance</th>
               </tr>
             </thead>
             <tbody>
@@ -341,10 +342,13 @@ function AttendancePage() {
                       ? new Date(record.date).toLocaleDateString()
                       : "—"}
                   </td>
-                  <td>{formatTo12Hour(record.time_in)}</td>
+                  <td>
+                    {record.time_in ? formatTo12Hour(record.time_in) : "—"}
+                  </td>
                   <td>
                     {record.time_out ? formatTo12Hour(record.time_out) : "—"}
                   </td>
+                  {!isStudent ? <td>{record.distance}</td> : null}
                 </tr>
               ))}
             </tbody>
