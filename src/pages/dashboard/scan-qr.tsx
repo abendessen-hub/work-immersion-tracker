@@ -152,7 +152,7 @@ function ScanQrPage() {
           ? "In production environments, this account can scan any company QR to test its location without recording attendance."
           : user?.accessId === 1
             ? "Scan your assigned company QR while signed in to record your own attendance."
-            : "Scan the given student QR to record their attendance"
+            : "Scan the given student QR to record their attendance."
       }
     >
       {user?.accessId === 1 ? (

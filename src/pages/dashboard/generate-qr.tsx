@@ -91,7 +91,7 @@ function GenerateQrPage() {
       title="Generate QR"
       description={
         user?.accessId === 1
-          ? "Generate a stueent QR Code for attendance"
+          ? "Generate a stueent QR Code for attendance."
           : "Generate a unique company check-in QR Code PNG."
       }
     >
