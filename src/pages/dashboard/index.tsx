@@ -42,7 +42,7 @@ const actions = [
     description:
       "Create and download official check-in QR codes for companies.",
     tag: "Admin/Deployer",
-    accessLevels: [3, 4],
+    accessLevels: [1, 3, 4],
     icon: <QrCode2Icon />,
     to: "/dashboard/generate-qr",
   },

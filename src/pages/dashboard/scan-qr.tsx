@@ -185,8 +185,8 @@ function ScanQrPage() {
         </>
       ) : (
         <p className="dashboard-message dashboard-message--error" role="status">
-          Company check-in is available to student accounts. Higher access
-          levels can review attendance from the Attendance page.
+          Work In Progress. Teachers, Admins, and Deployers will have access to
+          scan the QR of students in need of help with Attendance.
         </p>
       )}
       {message ? (

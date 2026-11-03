@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import DashboardLayout from "./layout";
+import { useAuth } from "../../context/useAuth";
 import SimpleButton from "../../components/simple-button";
 
 type Company = { company_id: number; company_name: string };
 
 function GenerateQrPage() {
+  const { user } = useAuth();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [companyId, setCompanyId] = useState("");
   const [qrDataUrl, setQrDataUrl] = useState("");
@@ -16,12 +18,15 @@ function GenerateQrPage() {
     fetch("/api/reference-data")
       .then(async (response) => {
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error ?? "Could not load companies.");
+        if (!response.ok)
+          throw new Error(data.error ?? "Could not load companies.");
         setCompanies(data.companies as Company[]);
       })
       .catch((error: unknown) => {
         setIsError(true);
-        setMessage(error instanceof Error ? error.message : "Could not load companies.");
+        setMessage(
+          error instanceof Error ? error.message : "Could not load companies.",
+        );
       });
   }, []);
 
@@ -52,10 +57,16 @@ function GenerateQrPage() {
         }),
       );
       setIsError(false);
-      setMessage(`Company check-in QR created for ${selectedCompany.company_name}.`);
+      setMessage(
+        `Company check-in QR created for ${selectedCompany.company_name}.`,
+      );
     } catch (error) {
       setIsError(true);
-      setMessage(error instanceof Error ? error.message : "QR code could not be generated.");
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "QR code could not be generated.",
+      );
     } finally {
       setBusy(false);
     }
@@ -65,10 +76,12 @@ function GenerateQrPage() {
     if (!qrDataUrl || !selectedCompany) return;
     const link = document.createElement("a");
     link.href = qrDataUrl;
-    link.download = `${selectedCompany.company_name
-      .toLocaleLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "") || "company"}-check-in-qr.png`;
+    link.download = `${
+      selectedCompany.company_name
+        .toLocaleLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "company"
+    }-check-in-qr.png`;
     link.click();
   };
 
@@ -78,57 +91,77 @@ function GenerateQrPage() {
       title="Generate QR"
       description="Generate a unique company check-in QR Code PNG."
     >
-      <div className="dashboard-section">
-        <h2 className="dashboard-section-title">Company check-in QR</h2>
-        <p className="dashboard-section-sub">
-          Students scan their assigned company&apos;s code while signed in to record
-          their own time in or time out.
+      {user?.accessId !== 1 ? (
+        <>
+          <div className="dashboard-section">
+            <h2 className="dashboard-section-title">Company check-in QR</h2>
+            <p className="dashboard-section-sub">
+              Students scan their assigned company&apos;s code while signed in
+              to record their own time in or time out.
+            </p>
+          </div>
+          <div className="dashboard-form">
+            <div className="form-field">
+              <label htmlFor="qr-company">Company</label>
+              <select
+                id="qr-company"
+                value={companyId}
+                onChange={(event) => {
+                  setCompanyId(event.target.value);
+                  setQrDataUrl("");
+                  setMessage("");
+                }}
+                required
+              >
+                <option value="">Select a company</option>
+                {companies.map((company) => (
+                  <option key={company.company_id} value={company.company_id}>
+                    {company.company_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="dashboard-inline-actions">
+              <SimpleButton
+                type="button"
+                onClick={generate}
+                disabled={busy || !companies.length}
+              >
+                {busy ? "Generating..." : "Generate QR Code"}
+              </SimpleButton>
+              <SimpleButton
+                type="button"
+                variant="secondary"
+                onClick={download}
+                disabled={!qrDataUrl}
+              >
+                Download PNG
+              </SimpleButton>
+            </div>
+            {qrDataUrl ? (
+              <img
+                className="qr-preview"
+                src={qrDataUrl}
+                alt={`Company check-in QR code for ${selectedCompany?.company_name ?? "selected company"}`}
+              />
+            ) : null}
+          </div>
+        </>
+      ) : (
+        <p className="dashboard-message dashboard-message--error" role="status">
+          Work In Progress. Students will be able to generate a temporary QR
+          code for help with higher access levels.
         </p>
-      </div>
-      <div className="dashboard-form">
-        <div className="form-field">
-          <label htmlFor="qr-company">Company</label>
-          <select
-            id="qr-company"
-            value={companyId}
-            onChange={(event) => {
-              setCompanyId(event.target.value);
-              setQrDataUrl("");
-              setMessage("");
-            }}
-            required
-          >
-            <option value="">Select a company</option>
-            {companies.map((company) => (
-              <option key={company.company_id} value={company.company_id}>
-                {company.company_name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="dashboard-inline-actions">
-          <SimpleButton type="button" onClick={generate} disabled={busy || !companies.length}>
-            {busy ? "Generating..." : "Generate QR Code"}
-          </SimpleButton>
-          <SimpleButton
-            type="button"
-            variant="secondary"
-            onClick={download}
-            disabled={!qrDataUrl}
-          >
-            Download PNG
-          </SimpleButton>
-        </div>
-        {qrDataUrl ? (
-          <img
-            className="qr-preview"
-            src={qrDataUrl}
-            alt={`Company check-in QR code for ${selectedCompany?.company_name ?? "selected company"}`}
-          />
-        ) : null}
-      </div>
+      )}
       {message ? (
-        <p className={isError ? "dashboard-message dashboard-message--error" : "dashboard-message"} role="status">
+        <p
+          className={
+            isError
+              ? "dashboard-message dashboard-message--error"
+              : "dashboard-message"
+          }
+          role="status"
+        >
           {message}
         </p>
       ) : null}
