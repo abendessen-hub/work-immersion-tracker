@@ -117,8 +117,8 @@ To safeguard student privacy and account integrity:
 The WIMS dashboard adopts a clean, professional, and minimalist aesthetic:
 
 - **Header Indicators:** Displays the system title, user greeting, and an identity badge indicating your active portal role (**Student Portal**, **Teacher Portal**, **Admin Portal**, or **Deployer Portal**).
-- **Action Cards:** Interactive tiles displaying an intuitive icon, module title, operational description, role badge, and navigation arrow.
-- **Return Navigation:** Every sub-module includes a clean ghost **Back** button at the upper right to quickly return to the dashboard.
+- **Action Cards:** Interactive tiles displaying an intuitive icon, card title, operational description, role badge, and navigation arrow.
+- **Return Navigation:** Every sub-card includes a clean ghost **Back** button at the upper right to quickly return to the dashboard.
 - **Session Termination:** Click the **Log Out** button at any time to invalidate your active session.
 
 ### 5.2 Scan QR (Student Attendance Logging)
@@ -280,7 +280,7 @@ WIMS features an interface centered around minimalism, clarity, and professional
 | :----------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `Invalid username or password`                         | Typographical error in credentials, uppercase letters in student username, or extra spaces.                     | Re-verify that the student username follows the lowercase convention (`[last 4 digits LRN][lastname]`). Use the eye toggle to inspect typed characters before submission. |
 | `This company QR does not match your assigned company` | The scanned QR belongs to a different immersion partner than the student's profile assignment.                  | Verify the physical QR code poster. If the student has changed deployment companies, an administrator must update the student's company assignment.                       |
-| `Your attendance is already complete for today`        | Both Time In and Time Out scans have already been recorded for the current calendar date (`Asia/Manila`).       | No further action required. The daily shift is logged and verifiable in the **Attendance** module.                                                                        |
+| `Your attendance is already complete for today`        | Both Time In and Time Out scans have already been recorded for the current calendar date (`Asia/Manila`).       | No further action required. The daily shift is logged and verifiable in the **Attendance** card.                                                                          |
 | `Missing template columns: ...`                        | One or more column headers in the uploaded Excel file were modified, reordered, or deleted.                     | Click **Download Template** on the **Create Student Accounts** screen to fetch a fresh file and copy student data under the pre-existing header titles.                   |
 | `Row X: Section / Company was not found.`              | The company or section name in row `X` does not match active system references.                                 | Check the on-screen reference lists in **Create Student Accounts** or **Manage References** and correct the spelling in the spreadsheet.                                  |
 | `Download Attendance Report.xlsx` button disabled      | Required filters (Date, Section, and Company) are incomplete, or the selected filter combination has 0 records. | Ensure a **Date**, **Section**, and **Company** are selected in the filter toolbar and at least one matching record exists in the table.                                  |
