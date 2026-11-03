@@ -44,7 +44,7 @@ function ActionCard({
       </div>
 
       <div className="action-card-foot" aria-hidden="true">
-        <span className="action-cta">Open module</span>
+        <span className="action-cta">Open card</span>
         <span className="action-arrow">→</span>
       </div>
     </button>

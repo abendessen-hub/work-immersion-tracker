@@ -80,7 +80,7 @@ function DashboardPage() {
     <DashboardLayout
       eyebrow="Dashboard"
       title="Work Immersion Monitoring System (WIMS)"
-      description={`Welcome back, ${user?.fullname || "User"}. Select a module below to manage immersion operations.`}
+      description={`Welcome back, ${user?.fullname || "User"}. Select a card below to manage immersion operations.`}
       back={false}
       logout={true}
     >
