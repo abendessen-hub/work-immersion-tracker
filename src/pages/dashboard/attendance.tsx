@@ -327,7 +327,7 @@ function AttendancePage() {
                 <th scope="col">Date</th>
                 <th scope="col">Time in</th>
                 <th scope="col">Time out</th>
-                <th scope="col">Distance</th>
+                {!isStudent ? <th scope="col">Distance</th> : null}
               </tr>
             </thead>
             <tbody>
