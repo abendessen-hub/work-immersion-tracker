@@ -106,21 +106,17 @@ and [`database/migrations/004_add_invisible_distance.sql`](./database/migrations
 against the Neon database configured by `DATABASE_URL`. The first migration creates the reference
 tables `access_reference`, `company_reference`, `immersion_teacher`, and
 `section_reference`, along with `users` and `attendance_record` matching the
-provided Neon schema. The second migration adds company geofence coordinates and
-radius, including for databases created before location checks were added.
+provided Neon schema. The second migration adds company geofence coordinates, including for databases created before location checks were added.
 The third migration removes the obsolete company assignment from section
 references; company is assigned directly to each user account.
 
 Add reference rows to `section_reference(section_name)` and
 `company_reference(company_name)` before importing students. Section/company names
 in the workbook match those references without case sensitivity.
-Use **Manage References** as an admin to create or update companies, set each
-company's coordinates (manually or from the current device location), and choose
-its allowed check-in radius. Student QR check-ins require device location access
-and are rejected if the reported location falls outside that radius plus a
-GPS-accuracy buffer of up to 20 m. The buffer only applies when the device's
-reported accuracy supports the distance beyond the configured radius.
-Geolocation requires HTTPS except on localhost.
+Use **Manage References** as an admin to create or update companies and set each
+company's coordinates (manually or from the current device location). Student QR check-ins require device location access,
+and the app compares the reported location against the company coordinates before
+allowing the check-in. Geolocation requires HTTPS except on localhost.
 `immersion_teacher` is a separate reference entity; it does not create or grant a
 teacher login. Access role IDs are looked up by name from `access_reference`.
 

@@ -370,7 +370,7 @@ function ManageReferences() {
           <section className="dashboard-section reference-panel">
             <h2 className="dashboard-section-title">Company references</h2>
             <p className="dashboard-section-sub">
-              Each company needs a location and check-in radius before students
+              Each company needs a location before students
               can record attendance there.
             </p>
             <form

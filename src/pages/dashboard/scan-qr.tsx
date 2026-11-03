@@ -89,7 +89,7 @@ function ScanQrPage() {
       if (result.testOnly === true) {
         setIsError(false);
         setMessage(
-          `Location check passed for ${result.companyName} (${result.distanceMeters} m away; ${result.allowedDistanceMeters} m allowed for this GPS fix, including the ${result.radiusMeters} m company radius). Attendance was not recorded.`,
+          `Location check passed for ${result.companyName} (${result.distanceMeters} m away}. Attendance was not recorded.`,
         );
         return;
       }
@@ -224,7 +224,7 @@ function ScanQrPage() {
           </h2>
           <p className="dashboard-section-sub">
             {isLocationTestAccount
-              ? "The location must be within the scanned company's check-in radius. This test does not record attendance. Allow location access when prompted."
+              ? "This test does not record attendance. Allow location access when prompted."
               : isStudent
                 ? "First scan records time in; the next scan records time out. Your assigned company and location are checked."
                 : user?.accessId === 2

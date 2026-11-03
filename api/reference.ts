@@ -7,7 +7,6 @@ type CompanyInput = {
   companyName: string;
   latitude: number;
   longitude: number;
-  radiusMeters: number;
 };
 
 type SectionInput = {
@@ -30,7 +29,7 @@ function cleanName(value: unknown): string | null {
 
 function companyInput(body: RequestBody): CompanyInput | null {
   const companyName = cleanName(body.companyName);
-  const { latitude, longitude, radiusMeters } = body;
+  const { latitude, longitude } = body;
   if (
     !companyName ||
     typeof latitude !== "number" ||
@@ -40,15 +39,11 @@ function companyInput(body: RequestBody): CompanyInput | null {
     typeof longitude !== "number" ||
     !Number.isFinite(longitude) ||
     longitude < -180 ||
-    longitude > 180 ||
-    typeof radiusMeters !== "number" ||
-    !Number.isSafeInteger(radiusMeters) ||
-    radiusMeters < 1 ||
-    radiusMeters > 50000
+    longitude > 180 
   ) {
     return null;
   }
-  return { companyName, latitude, longitude, radiusMeters };
+  return { companyName, latitude, longitude };
 }
 
 function sectionInput(body: RequestBody): SectionInput | null {
@@ -77,7 +72,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       const [companies, accessReferences, sections] = await Promise.all([
         sql`
-          SELECT company_id, company_name, latitude, longitude, radius_meters
+          SELECT company_id, company_name, latitude, longitude
           FROM company_reference
           ORDER BY company_name
         `,
@@ -135,7 +130,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!input) {
         return res.status(400).json({
           error:
-            "Enter a company name, valid coordinates, and a radius from 1 to 50,000 meters",
+            "Enter a company name, valid coordinates.",
         });
       }
 
@@ -160,10 +155,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (req.method === "POST") {
         const created = await sql`
           INSERT INTO company_reference
-            (company_name, latitude, longitude, radius_meters)
+            (company_name, latitude, longitude)
           VALUES
-            (${input.companyName}, ${input.latitude}, ${input.longitude}, ${input.radiusMeters})
-          RETURNING company_id, company_name, latitude, longitude, radius_meters
+            (${input.companyName}, ${input.latitude}, ${input.longitude})
+          RETURNING company_id, company_name, latitude, longitude
         `;
         return res.status(201).json({ company: created[0] });
       }
@@ -172,10 +167,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         UPDATE company_reference
         SET company_name = ${input.companyName},
             latitude = ${input.latitude},
-            longitude = ${input.longitude},
-            radius_meters = ${input.radiusMeters}
+            longitude = ${input.longitude}
         WHERE company_id = ${companyId}
-        RETURNING company_id, company_name, latitude, longitude, radius_meters
+        RETURNING company_id, company_name, latitude, longitude
       `;
       if (!updated.length) {
         return res.status(404).json({ error: "Company reference not found" });

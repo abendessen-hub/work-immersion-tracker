@@ -16,7 +16,7 @@
    - [5.2 Scan QR (Student Attendance Logging)](#52-scan-qr-student-attendance-logging)
    - [5.3 Attendance Monitoring & Excel Reports](#53-attendance-monitoring--excel-reports)
    - [5.4 Create Student Accounts (Bulk Excel Import)](#54-create-student-accounts-bulk-excel-import)
-   - [5.5 Manage References (Geofencing & System Data)](#55-manage-references-geofencing--system-data)
+   - [5.5 Manage References (Location & System Data)](#55-manage-references-location--system-data)
    - [5.6 Generate QR (Partner Company Setup)](#56-generate-qr-partner-company-setup)
    - [5.7 Create Account (General User Provisioning)](#57-create-account-general-user-provisioning)
    - [5.8 Manage Accounts (User Administration & Directory)](#58-manage-accounts-user-administration--directory)
@@ -32,7 +32,7 @@ The **Work Immersion Monitoring System (WIMS)** is a centralized web platform de
 By substituting manual paper logbooks with secure, location-verified QR scanning, automated spreadsheet management, and paginated data tables, WIMS guarantees high operational efficiency and data fidelity from student deployment to program completion.
 
 * **Verifiable Attendance Tracking:** Records daily **Time In** and **Time Out** with company-specific QR validation calibrated to Philippine Standard Time (`Asia/Manila`).
-* **Geofencing & GPS Radius Verification:** Enforces check-in boundaries (in meters) around partner company coordinates (`latitude` and `longitude`), ensuring students log attendance while physically on-site.
+* **GPS Location Verification:** Compares each device's current location against a partner company's saved coordinates (`latitude` and `longitude`) before the check-in is accepted.
 * **Role-Based Data Privacy:** Students access solely their personal attendance history. Immersion teachers, deployers, and administrators are equipped with live statistics, multi-parameter filters (Date, Section, Company), and one-click Excel (`.xlsx`) report exports.
 * **Streamlined Bulk Onboarding:** Enables rapid provisioning of up to 500 student accounts in a single batch using standardized Excel templates.
 * **Enforced Account Security:** Mandates password updates upon initial sign-in for newly generated accounts.
@@ -62,7 +62,7 @@ WIMS implements role-based access control (RBAC) across four standard access lev
 ## 3. Quick-Start Workflows by Role
 
 ### For Administrators (Level 3) & Deployers (Level 4)
-1. **Configure Reference Locations:** Navigate to **Manage References** to establish partner companies, check-in radius (e.g., 20 meters), and geographic coordinates (latitude and longitude). Use the built-in search and pagination to browse active companies and sections.
+1. **Configure Reference Locations:** Navigate to **Manage References** to establish partner companies and geographic coordinates (latitude and longitude). Use the built-in search and pagination to browse active companies and sections.
 2. **Generate Company QR Codes:** In **Generate QR**, generate and download high-resolution PNG QR codes for each partner company and deliver them to designated immersion sites.
 3. **Provision Supervising Staff & Accounts:** In **Create Account**, register accounts for teachers, deployers, or administrators.
 4. **Oversee System Accounts:** Use **Manage Accounts** to review user statuses, filter across paginated records, update profile assignments, or reset passwords.
@@ -120,12 +120,12 @@ The WIMS dashboard adopts a clean, professional, and minimalist aesthetic:
 1. From the dashboard, select **Scan QR**.
 2. Students tap **Start Camera**, grant browser camera permission, and scan their assigned company's official WIMS QR code.
 3. Staff may scan a temporary student attendance QR with **Start Camera**, or upload the PNG the student sent.
-4. A temporary attendance record is saved for the date in the QR with **11:00 AM** time in, **1:00 PM** time out, and **20 meters** distance.
+4. A temporary attendance record is saved for the date in the QR with **11:00 AM** time in and **1:00 PM** time out.
 
 **Validation Protocols:**
 * **Company Locking:** Each student is registered to a specific immersion company. Scanning a QR code belonging to a different company is blocked with a validation alert.
 * **Two-Scan Daily Limit:** Each student is restricted to one arrival and one departure timestamp per calendar day (`Asia/Manila`).
-* **Geofence Proximity:** If GPS verification is active for the company, the device's location must fall within the configured perimeter radius.
+* **GPS Coordinate Check:** If GPS verification is active for the company, the app compares the device's location against the saved company coordinates before allowing the attendance scan.
 * **Section Access:** Teachers can record temporary attendance only for students in their assigned section. Admins and deployers may record for any student.
 * **Temporary QR safeguards:** The QR is signed by WIMS, cannot be edited to change its student/date, and cannot create a duplicate record for the same student and date.
 
@@ -172,15 +172,14 @@ The WIMS dashboard adopts a clean, professional, and minimalist aesthetic:
 6. Click **Create Accounts & Download XLSX**.
 7. The browser automatically downloads `student-accounts.xlsx` containing the newly minted credentials (usernames and temporary passwords) ready for distribution.
 
-### 5.5 Manage References (Geofencing & System Data)
+### 5.5 Manage References (Location & System Data)
 * **Access Level:** Admins (Level 3) can manage companies, sections, and access references. Deployers (Level 4) can manage companies and sections.
-* **Objective:** Configure partner companies, geofences, sections, and access reference definitions.
+* **Objective:** Configure partner companies, saved coordinates, sections, and access reference definitions.
 
 #### Company References
 * **Company Name:** Legal/official trade name of the immersion partner.
-* **Allowed Radius (meters):** Maximum distance allowed for mobile check-in (e.g., `20` meters).
 * **Latitude & Longitude:** Exact GPS coordinates. Click **Use Current Location** to automatically capture device coordinates with high accuracy.
-* **Search & List:** Paginated reference cards (20 per page) with search bar, displaying coordinates, radius, and **Edit** and **Delete** actions.
+* **Search & List:** Paginated reference cards (20 per page) with search bar, displaying coordinates and **Edit** and **Delete** actions.
 
 #### Section References
 * Defines class sections. Sections exist independently so students can be mapped to any company regardless of section.
