@@ -130,9 +130,10 @@ distribute it securely.
 Keep LRN and contact-number cells formatted as text to preserve leading zeros.
 Company QR codes record time in on first scan and time out on the next scan for
 the signed-in student. Attendance access is restricted server-side to the
-student's own rows during normal check-in. Students can also generate a signed
-temporary QR for an unrecorded date; teachers can record it only for students
-in their section, while admins and deployers can record it for any student.
+student's own rows during normal check-in. Students can also generate and
+download a signed temporary QR PNG for an unrecorded date to send to their
+teacher; students cannot print this QR from the app. Teachers can record it only
+for students in their section, while admins and deployers can record it for any student.
 Temporary records use 11:00 AM time in, 1:00 PM time out, and 20 meters.
 Teacher/admin/deployer reports can filter by date, section, and company.
 

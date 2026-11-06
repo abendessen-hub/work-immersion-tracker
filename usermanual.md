@@ -214,13 +214,13 @@ The WIMS dashboard adopts a clean, professional, and minimalist aesthetic:
 ### 5.6 Generate QR (Partner Company Setup)
 
 - **Access Level:** Students (Level 1), Admins (Level 3), and Deployers (Level 4)
-- **Objective:** Students generate temporary attendance QR PNGs; admins and deployers generate company check-in QR codes.
+- **Objective:** Students generate and download temporary attendance QR PNGs to send to their teacher; student QR printing is not available. Admins and deployers generate company check-in QR codes and can print them.
 
 #### Student temporary attendance QR
 
 1. Select **Generate QR** from the dashboard.
 2. Choose the missed attendance date. Dates in the future and dates with an existing attendance record are rejected.
-3. Click **Generate Temporary QR**, then **Download PNG**.
+3. Click **Generate Temporary QR**, then **Download PNG**. Students can generate and download this QR but cannot print it from the app.
 4. Send the downloaded image to your teacher using a communication app. Your teacher can upload that image in **Scan QR**. Admins and deployers can also record it.
 
 #### Company check-in QR for admins and deployers

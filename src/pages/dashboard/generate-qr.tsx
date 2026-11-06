@@ -143,20 +143,13 @@ function GenerateQrPage() {
   };
 
   const handlePrint = () => {
-    if (!qrDataUrl) return;
+    if (!qrDataUrl || isStudent) return;
 
     const companyName = selectedCompany?.company_name ?? "";
-    const title =
-      companyName ||
-      (isStudent ? `Temporary Attendance (${attendanceDate})` : "Attendance QR Code");
-    const subTitle = selectedCompany
-      ? "Work Immersion Partner Company Check-in"
-      : isStudent
-        ? `Student: ${user?.fullname || "Student"}`
-        : "Work Immersion Attendance";
-    const instruction = selectedCompany
-      ? "Scan using the WIMS App on your device to record daily Time In and Time Out."
-      : "Send or present this QR code to your section teacher or school administrator to record missed attendance.";
+    const title = companyName || "Attendance QR Code";
+    const subTitle = "Work Immersion Partner Company Check-in";
+    const instruction =
+      "Scan using the WIMS App on your device to record daily Time In and Time Out.";
 
     const printFrame = document.createElement("iframe");
     printFrame.style.position = "fixed";
@@ -361,14 +354,6 @@ function GenerateQrPage() {
               disabled={!qrDataUrl}
             >
               Download PNG
-            </SimpleButton>
-            <SimpleButton
-              type="button"
-              variant="secondary"
-              onClick={handlePrint}
-              disabled={!qrDataUrl}
-            >
-              Print QR
             </SimpleButton>
           </div>
           {qrDataUrl ? (
